@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "id": "factory-builder",
+  "version": "${version}",
+
+  "name": "Factory Builder",
+  "description": "Implementation of the Factory API.",
+  "authors": [
+    "rizecookey"
+  ],
+  "contact": {
+    "homepage": "https://combatreforged.com/factory",
+    "sources": "https://github.com/CombatReforged/factory"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/factorybuilder/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.combatreforged.factory.builder.FactoryBuilder"
+    ],
+    "preLaunch": [
+      "com.combatreforged.factory.builder.prelaunch.FactoryBuilderPreLaunch"
+    ]
+  },
+  "mixins": [
+    "factorybuilder.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": [
+      "1.16.x",
+      "1.16.3-combat.8.c"
+    ],
+    "factory-api": "*"
+  },
+  "suggests": {
+  },
+  "accessWidener": "factorybuilder.accesswidener"
+}

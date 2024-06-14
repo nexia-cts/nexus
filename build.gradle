@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'net.ltgt.errorprone' version "2.0.2"
+    id 'maven-publish'
+}
+
+group 'com.combatreforged.factory'
+version '0.1.13'
+
+def props = new Properties()
+def file = file("maven.properties")
+if (file.exists()) {
+    System.out.println("Publishing enabled")
+    file.withInputStream { props.load(it) }
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'net.ltgt.errorprone'
+    apply plugin: 'maven-publish'
+
+    version rootProject.version
+
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'sonatype-oss'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+        maven {
+            name = "minecraft"
+            url = 'https://libraries.minecraft.net/'
+        }
+    }
+
+    dependencies {
+        errorprone implementation('com.google.errorprone:error_prone_core:2.10.0')
+    }
+
+    compileJava {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    publishing {
+        repositories {
+            if (props.containsKey("maven.url")) {
+                maven {
+                    url props.get("maven.url")
+                    credentials {
+                        username props.get("maven.username")
+                        password props.get("maven.password")
+                    }
+                }
+            }
+        }
+    }
+}
