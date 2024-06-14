@@ -25,6 +25,7 @@ public interface Player extends LivingEntity, MessageReceiver {
     PlayerInventory getInventory();
     int getSelectedSlot();
 
+    void disconnect(Component component);
     boolean isFlying();
     void setFlying(boolean flying);
     boolean isAbleToFly();

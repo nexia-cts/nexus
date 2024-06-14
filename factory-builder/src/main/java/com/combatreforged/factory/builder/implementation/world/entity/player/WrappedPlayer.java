@@ -100,6 +100,11 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
     }
 
     @Override
+    public void disconnect(Component component) {
+        wrappedPlayer().connection.disconnect(ObjectMappings.convertComponent(component));
+    }
+
+    @Override
     public boolean isFlying() {
         return wrappedPlayer().abilities.flying;
     }
