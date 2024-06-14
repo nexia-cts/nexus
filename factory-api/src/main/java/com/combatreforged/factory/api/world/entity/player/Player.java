@@ -8,6 +8,7 @@ import com.combatreforged.factory.api.world.item.container.PlayerInventory;
 import com.combatreforged.factory.api.world.item.container.menu.ContainerMenu;
 import com.combatreforged.factory.api.world.item.container.menu.MenuHolder;
 import com.combatreforged.factory.api.world.scoreboard.Scoreboard;
+import com.combatreforged.factory.api.world.sound.SoundType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,10 @@ public interface Player extends LivingEntity, MessageReceiver {
     PlayerInventory getInventory();
     int getSelectedSlot();
 
+    void playSound(SoundType soundType, float volume, float pitch);
+
     void disconnect(Component component);
+
     boolean isFlying();
     void setFlying(boolean flying);
     boolean isAbleToFly();

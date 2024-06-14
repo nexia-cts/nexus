@@ -7,6 +7,7 @@ import com.combatreforged.factory.api.world.item.container.menu.ContainerMenu;
 import com.combatreforged.factory.api.world.item.container.menu.MenuHolder;
 import com.combatreforged.factory.api.world.nbt.NBTObject;
 import com.combatreforged.factory.api.world.scoreboard.Scoreboard;
+import com.combatreforged.factory.api.world.sound.SoundType;
 import com.combatreforged.factory.api.world.util.Location;
 import com.combatreforged.factory.api.world.util.Vector3D;
 import com.combatreforged.factory.builder.exception.WrappingException;
@@ -21,21 +22,30 @@ import com.combatreforged.factory.builder.implementation.world.item.container.me
 import com.combatreforged.factory.builder.implementation.world.item.container.menu.WrappedMenuHolder;
 import com.combatreforged.factory.builder.implementation.world.scoreboard.WrappedScoreboard;
 import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Lifecycle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import net.minecraft.core.Registry;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesPacket;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerScoreboard;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleMenuProvider;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 import static com.combatreforged.factory.builder.implementation.util.ObjectMappings.convertComponent;
@@ -97,6 +107,13 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
     @Override
     public int getSelectedSlot() {
         return wrappedPlayer().inventory.selected;
+    }
+
+    @Override
+    public void playSound(SoundType soundType, float volume, float pitch) {
+        String string = ObjectMappings.SOUNDS.get(soundType);
+        SoundEvent soundEvent = (SoundEvent) ((WritableRegistry) Registry.SOUND_EVENT).registerOrOverride(OptionalInt.empty(), ResourceKey.create(Registry.SOUND_EVENT.key(), new ResourceLocation(string)), new SoundEvent(new ResourceLocation(string)), Lifecycle.stable());
+        this.wrappedPlayer().connection.send(new ClientboundSoundPacket(soundEvent, SoundSource.MASTER, this.getLocation().getX(), this.getLocation().getY(), this.getLocation().getZ(), volume, pitch));
     }
 
     @Override
