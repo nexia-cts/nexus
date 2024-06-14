@@ -90,6 +90,7 @@ public abstract class PlayerListMixin {
         }
     }
 
+    /*
     @ModifyVariable(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", ordinal = 0, shift = At.Shift.AFTER), ordinal = 1)
     public boolean modifyIsForced(boolean prev) {
         if (respawnEvent != null) {
@@ -98,6 +99,7 @@ public abstract class PlayerListMixin {
             return prev;
         }
     }
+     */
 
     @ModifyVariable(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", ordinal = 0, shift = At.Shift.AFTER))
     public ServerLevel modifyLevel(ServerLevel prev) {

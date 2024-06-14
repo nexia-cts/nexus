@@ -46,11 +46,13 @@ import java.util.Map;
 public abstract class CommandsMixin {
     @Shadow @Final private CommandDispatcher<CommandSourceStack> dispatcher;
 
+    /*
     // Makes non-syntax errors log
     @Redirect(method = "performCommand", at = @At(value = "INVOKE", target = "Lorg/apache/logging/log4j/Logger;isDebugEnabled()Z",remap = false))
     public boolean activateCommandExecutionErrors(Logger instance) {
         return true;
     }
+     */
 
     @Redirect(method = "performCommand", at = @At(value = "INVOKE", target = "Lcom/mojang/brigadier/CommandDispatcher;execute(Lcom/mojang/brigadier/StringReader;Ljava/lang/Object;)I", remap = false))
     public int enableAPICommands(CommandDispatcher<?> commandDispatcher, StringReader input, Object source, CommandSourceStack commandSourceStack, String string) throws CommandSyntaxException {
