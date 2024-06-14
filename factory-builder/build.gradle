@@ -7,16 +7,14 @@ plugins {
 	id 'java-library'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 def minecraftVersion = "1.16_combat-6"
+def fabricLoaderVersion = "0.14.21"
 
-archivesBaseName = "factory-builder"
 version = "${rootProject.version}-${minecraftVersion}"
 group = parent.group
 
-repositories {
+base {
+	archivesBaseName = "factory-builder"
 }
 
 configurations {
@@ -27,7 +25,7 @@ configurations {
 dependencies {
 	minecraft "com.mojang:minecraft:${minecraftVersion}"
 	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:0.12.12"
+	modImplementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
 
 	api project(":factory-api")
 	include project(":factory-api")
@@ -51,21 +49,24 @@ processResources {
 	}
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
 	options.encoding = "UTF-8"
 }
 
 java {
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+
 	withSourcesJar()
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${archiveBaseName}"}
 	}
 }
 
-task fullJar(type: RemapJarTask) {
+tasks.register('fullJar', RemapJarTask) {
 	dependsOn jar
 	archiveClassifier = "full"
 	input = jar {

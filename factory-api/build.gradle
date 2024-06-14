@@ -33,7 +33,7 @@ configurations {
 dependencies {
     // make sure to use the correct versions of mcProvided artifacts for the Minecraft version (look into the version manifest)
     mcProvided 'org.apache.logging.log4j:log4j-api:2.8.1'
-    mcProvided 'org.apache.logging.log4j:log4j-core:2.8.1'
+    mcProvided 'org.apache.logging.log4j:log4j-core:2.17.0'
 
     apiParts 'net.kyori:adventure-api:4.9.3'
     apiParts 'net.kyori:adventure-text-serializer-gson:4.9.3'
@@ -51,21 +51,21 @@ processResources {
     }
 }
 
-task fullJar(type: Jar) {
+tasks.register('fullJar', Jar) {
     group = "build"
     archiveClassifier = "full"
 
-    from (configurations.include.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }) {
+    from(configurations.include.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/**"
     }
 
     with jar
 }
 
-task fullNoDuplicatesJar(type: Jar) {
+tasks.register('fullNoDuplicatesJar', Jar) {
     archiveClassifier = "full-no-duplicates"
 
-    from (configurations.apiParts.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }) {
+    from(configurations.apiParts.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude "META-INF/**"
     }
 
