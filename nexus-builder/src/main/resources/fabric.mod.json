@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "nexus-builder",
+  "version": "${version}",
+
+  "name": "Nexus Builder",
+  "description": "Implementation of the Nexus API.",
+  "authors": [
+    "rizecookey"
+  ],
+  "contact": {
+    "homepage": "https://nexia.dev/",
+    "sources": "https://github.com/nexia-cts/nexus"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/nexusbuilder/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.nexia.nexus.builder.NexusBuilder"
+    ],
+    "preLaunch": [
+      "com.nexia.nexus.builder.prelaunch.NexusBuilderPreLaunch"
+    ]
+  },
+  "mixins": [
+    "nexusbuilder.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "minecraft": [
+      "1.16.x",
+      "1.16.3-combat.8.c"
+    ],
+    "nexus-api": "*"
+  },
+  "accessWidener": "nexusbuilder.accesswidener"
+}

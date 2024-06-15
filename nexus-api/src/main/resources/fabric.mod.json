@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "id": "nexus-api",
+  "name": "Nexus API",
+  "authors": ["rizecookey"],
+  "version": "${version}"
+}

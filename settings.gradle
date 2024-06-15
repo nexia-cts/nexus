@@ -9,6 +9,6 @@ pluginManagement {
     }
 }
 
-include ":factory-api"
-include ":factory-builder"
+include ":nexus-api"
+include ":nexus-builder"
 
