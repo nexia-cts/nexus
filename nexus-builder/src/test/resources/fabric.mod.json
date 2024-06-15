@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "nexus-test",
+  "version": "0.1.0",
+
+  "name": "Nexus Test",
+  "description": "Testing the Nexus API.",
+  "authors": [
+    "rizecookey"
+  ],
+
+  "environment": "server",
+  "entrypoints": {
+    "nexus": [
+      "net.rizecookey.nexustest.TestPlugin"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.10.8",
+    "nexus-api": "*"
+  }
+}
