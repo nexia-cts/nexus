@@ -4,11 +4,13 @@ import com.combatreforged.factory.api.FactoryAPI;
 import com.combatreforged.factory.api.command.CommandSourceInfo;
 import com.combatreforged.factory.api.event.player.*;
 import com.combatreforged.factory.api.world.entity.player.Player;
+import com.combatreforged.factory.api.world.item.ItemStack;
 import com.combatreforged.factory.api.world.util.Location;
 import com.combatreforged.factory.builder.extension.server.level.ServerPlayerExtension;
 import com.combatreforged.factory.builder.implementation.Wrapped;
 import com.combatreforged.factory.builder.implementation.util.ObjectMappings;
 import com.combatreforged.factory.builder.implementation.world.entity.player.WrappedPlayer;
+import com.combatreforged.factory.builder.implementation.world.item.WrappedItemStack;
 import com.combatreforged.factory.builder.implementation.world.item.container.menu.WrappedContainerMenu;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.ParseResults;
@@ -25,6 +27,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Inventory;
 import org.objectweb.asm.Opcodes;
@@ -143,6 +146,26 @@ public abstract class ServerGamePacketListenerImplMixin {
     }
 
     // END: MOVE EVENT
+
+    @Inject(method = "handlePlayerAction", at = @At("RETURN"), cancellable = true)
+    public void injectSwapHandItemsEvent(ServerboundPlayerActionPacket serverboundPlayerActionPacket, CallbackInfo ci) {
+        if (serverboundPlayerActionPacket.getAction() == ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND && !this.player.isSpectator()) {
+            Player player = Wrapped.wrap(this.player, WrappedPlayer.class);
+            ItemStack newOffhandItem = Wrapped.wrap(this.player.getItemInHand(InteractionHand.MAIN_HAND), WrappedItemStack.class);
+            ItemStack oldOffhandItem = Wrapped.wrap(this.player.getItemInHand(InteractionHand.OFF_HAND), WrappedItemStack.class);
+            PlayerSwapHandItemsEvent playerSwapHandItemsEvent = new PlayerSwapHandItemsEvent(player, oldOffhandItem, newOffhandItem);
+            PlayerSwapHandItemsEvent.BACKEND.invoke(playerSwapHandItemsEvent);
+
+            net.minecraft.world.item.ItemStack itemStack = this.player.getItemInHand(InteractionHand.OFF_HAND);
+            if (!playerSwapHandItemsEvent.isCancelled()) {
+                this.player.setItemInHand(InteractionHand.OFF_HAND, this.player.getItemInHand(InteractionHand.MAIN_HAND));
+                this.player.setItemInHand(InteractionHand.MAIN_HAND, itemStack);
+                this.player.stopUsingItem();
+            }
+
+            ci.cancel();
+        }
+    }
 
     @Redirect(method = "*", at = @At(value = "FIELD", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z"))
     public void injectChangeMovementStateEvent(Abilities abilities, boolean value) {

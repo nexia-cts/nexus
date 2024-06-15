@@ -11,6 +11,7 @@ import com.combatreforged.factory.api.world.item.ItemStack;
 import com.combatreforged.factory.api.world.item.ItemType;
 import com.combatreforged.factory.api.world.item.container.menu.ContainerMenuType;
 import com.combatreforged.factory.api.world.item.container.menu.MenuHolder;
+import com.combatreforged.factory.api.world.sound.SoundType;
 import com.combatreforged.factory.builder.extension.world.effect.MobEffectExtension;
 import com.combatreforged.factory.builder.extension.world.inventory.MenuTypeExtension;
 import com.combatreforged.factory.builder.implementation.Wrapped;
@@ -19,6 +20,7 @@ import com.combatreforged.factory.builder.implementation.world.item.container.me
 import net.kyori.adventure.text.Component;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.BlockItem;
@@ -224,6 +226,36 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
                 return BLOCKS.inverse().containsKey(mcType)
                         ? (T) BLOCKS.inverse().get(Registry.BLOCK.get(loc))
                         : (T) new BlockType.Other() {
+                    @Override
+                    public Identifier getNamespaceId() {
+                        return identifier;
+                    }
+
+                    @Override
+                    public String getId() {
+                        return identifier.pure();
+                    }
+                };
+            } else if (BlockType.class.isAssignableFrom(type) && Registry.SOUND_EVENT.getOptional(loc).isPresent()) {
+                final SoundEvent mcType = Registry.SOUND_EVENT.get(loc);
+                if (mcType == null) {
+                    return (T) new SoundType.Other() {
+                        @Override
+                        public Identifier getNamespaceId() {
+                            return identifier;
+                        }
+
+                        @Override
+                        public String getId() {
+                            return identifier.pure();
+                        }
+                    };
+                }
+
+                String replacedmcType = mcType.toString().toLowerCase().replace("_", ".");
+                return SOUNDS.inverse().containsKey(replacedmcType)
+                        ? (T) SOUNDS.inverse().get(replacedmcType)
+                        : (T) new SoundType.Other() {
                     @Override
                     public Identifier getNamespaceId() {
                         return identifier;

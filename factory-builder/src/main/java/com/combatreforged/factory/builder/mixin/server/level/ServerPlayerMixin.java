@@ -223,8 +223,14 @@ public abstract class ServerPlayerMixin extends net.minecraft.world.entity.playe
     @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;removeEntitiesOnShoulder()V", shift = At.Shift.BEFORE))
     public void loadValues(DamageSource damageSource, CallbackInfo ci) {
         this.deathEventHappened = true;
+        /*
         this.keepInv = !this.getDeathEvent().isDropEquipment();
         this.keepExp = !this.getDeathEvent().isDropExperience();
+        */
+
+        // TODO: fix that
+        // java.lang.NoSuchMethodError'boolean com.combatreforged.factory.api.event.entity.LivingEntityDeathEvent.isDropEquipment()'
+        // ???
     }
 
     @Inject(method = "die", at = @At("TAIL"))
