@@ -69,9 +69,7 @@ public class WrappedWorld extends Wrapped<ServerLevel> implements World {
     @Override
     public List<Entity> getEntities() {
         List<Entity> entities = new ArrayList<>();
-        wrapped.getAllEntities().forEach((entity) -> {
-            entities.add(Wrapped.wrap(entity, WrappedEntity.class));
-        });
+        wrapped.getAllEntities().forEach((entity) -> entities.add(Wrapped.wrap(entity, WrappedEntity.class)));
         return entities;
     }
 

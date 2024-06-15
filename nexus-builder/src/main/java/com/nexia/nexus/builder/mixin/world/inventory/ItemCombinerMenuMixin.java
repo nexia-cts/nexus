@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.ItemCombinerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,11 +17,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemCombinerMenu.class)
 public abstract class ItemCombinerMenuMixin implements BlockDependentMenu, LevelAccessOwner {
-    private ContainerLevelAccess prevAccess;
+    @Unique private ContainerLevelAccess prevAccess;
 
-    private Player player;
+    @Unique private Player player;
 
-    private boolean independent;
+    @Unique private boolean independent;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void injectCustomContainerLevelAccess(MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, CallbackInfo ci) {

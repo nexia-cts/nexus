@@ -180,8 +180,7 @@ public class WrappedItemStack extends Wrapped<net.minecraft.world.item.ItemStack
         if (listTag.isEmpty()) return ImmutableList.of();
         return listTag.stream()
                 .filter(tag -> {
-                    if (!(tag instanceof CompoundTag)) return false;
-                    CompoundTag compoundTag = (CompoundTag) tag;
+                    if (!(tag instanceof CompoundTag compoundTag)) return false;
                     return compoundTag.contains("id")
                             && Registry.ENCHANTMENT.get(new ResourceLocation(compoundTag.getString("id"))) != null
                             && compoundTag.contains("lvl")

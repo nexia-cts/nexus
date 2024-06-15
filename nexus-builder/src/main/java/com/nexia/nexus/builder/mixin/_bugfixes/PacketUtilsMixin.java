@@ -34,7 +34,7 @@ public class PacketUtilsMixin {
                 if (packetListener.getConnection().isConnected()) {
                     packet.handle(packetListener);
                 } else {
-                    LOGGER.debug("Ignoring packet due to disconnection: " + packet);
+                    LOGGER.debug("Ignoring packet due to disconnection: {}", packet);
                 }
 
             });

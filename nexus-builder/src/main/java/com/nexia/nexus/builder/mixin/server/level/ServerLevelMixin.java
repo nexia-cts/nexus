@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level implements WorldGenLevel, Wrap<World> {
-    private World wrapped;
+    @Unique private World wrapped;
 
     protected ServerLevelMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l) {
         super(writableLevelData, resourceKey, dimensionType, supplier, bl, bl2, l);

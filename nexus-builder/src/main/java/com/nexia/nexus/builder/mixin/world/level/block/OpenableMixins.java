@@ -58,7 +58,7 @@ public abstract class OpenableMixins {
         }
     }
 
-    @ModifyVariable(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", shift = At.Shift.BEFORE))
+    @ModifyVariable(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", shift = At.Shift.BEFORE), argsOnly = true)
     public BlockState modifyBlockState(BlockState prev) {
         if (changeBlockStateEvent != null && !changeBlockStateEvent.isCancelled()) {
             return ((WrappedBlock) changeBlockStateEvent.getNewBlockState()).state();

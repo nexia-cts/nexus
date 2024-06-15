@@ -188,8 +188,7 @@ public class BuilderImpl implements Builder {
                     }
                     break;
                 case PROJECTILE:
-                    if (entityCause instanceof Projectile) {
-                        Projectile projectile = (Projectile) entityCause;
+                    if (entityCause instanceof Projectile projectile) {
                         ds = DamageSource.indirectMobAttack(((WrappedEntity) projectile).unwrap(), (LivingEntity) ((WrappedEntity) projectile.getOwner()).unwrap());
                     }
                     break;

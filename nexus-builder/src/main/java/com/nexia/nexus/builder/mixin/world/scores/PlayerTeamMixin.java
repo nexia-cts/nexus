@@ -9,6 +9,7 @@ import net.minecraft.world.scores.Scoreboard;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerTeam.class)
 public abstract class PlayerTeamMixin implements Wrap<ScoreboardTeam>, PlayerTeamExtension {
     @Shadow @Final private Scoreboard scoreboard;
-    private WrappedScoreboardTeam wrapped;
+    @Unique private WrappedScoreboardTeam wrapped;
 
     @Inject(method = "<init>*", at = @At("TAIL"))
     public void injectWrapped(CallbackInfo ci) {

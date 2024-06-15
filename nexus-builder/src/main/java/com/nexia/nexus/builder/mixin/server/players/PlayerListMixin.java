@@ -41,7 +41,7 @@ public abstract class PlayerListMixin {
 
     @Shadow @Final private MinecraftServer server;
     // BEGIN: JOIN EVENT
-    Component joinMessage;
+    @Unique Component joinMessage;
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/ChatType;Ljava/util/UUID;)V", ordinal = 0))
     public void catchJoinMessage(PlayerList playerList, Component component, ChatType chatType, UUID uUID) {
         joinMessage = component;

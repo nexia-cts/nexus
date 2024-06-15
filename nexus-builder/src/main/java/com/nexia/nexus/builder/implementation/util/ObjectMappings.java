@@ -74,7 +74,7 @@ public abstract class ObjectMappings {
                 try {
                     Class.forName(clazz.getName());
                 } catch (ExceptionInInitializerError e) {
-                    LogManager.getLogger("ObjectMappings").error("Error while loading class '" + clazz.getName() + "':", e);
+                    LogManager.getLogger("ObjectMappings").error("Error while loading class '{}':", clazz.getName(), e);
                 }
             }
         } catch (ClassNotFoundException e) {

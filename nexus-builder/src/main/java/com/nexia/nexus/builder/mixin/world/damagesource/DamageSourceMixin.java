@@ -6,13 +6,14 @@ import com.nexia.nexus.builder.implementation.util.ObjectMappings;
 import com.nexia.nexus.builder.implementation.world.damage.WrappedDamageData;
 import net.minecraft.world.damagesource.DamageSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DamageSource.class)
 public abstract class DamageSourceMixin implements Wrap<DamageData> {
-    private DamageData wrapped;
+    @Unique private DamageData wrapped;
 
     @SuppressWarnings("unused")
     @Inject(method = "<clinit>", at = @At("TAIL"))

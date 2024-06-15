@@ -74,7 +74,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
 
     @Unique private PlayerChangeMovementStateEvent changeMovementStateEvent;
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "startFallFlying", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "startFallFlying", at = @At("HEAD"))
     public void injectChangeMovementStateEvent(CallbackInfo ci) {
         if (((EntityExtension) this).injectChangeMovementStateEvent() && (Object) this instanceof ServerPlayer && !this.isFallFlying()) {
             this.changeMovementStateEvent = new PlayerChangeMovementStateEvent(Wrapped.wrap(this, WrappedPlayer.class), PlayerChangeMovementStateEvent.ChangedState.FALL_FLYING, true);
@@ -92,7 +92,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "stopFallFlying", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "stopFallFlying", at = @At("HEAD"))
     public void injectChangeMovementStateEvent2(CallbackInfo ci) {
         if (((EntityExtension) this).injectChangeMovementStateEvent() && (Object) this instanceof ServerPlayer && this.isFallFlying()) {
             this.changeMovementStateEvent = new PlayerChangeMovementStateEvent(Wrapped.wrap(this, WrappedPlayer.class), PlayerChangeMovementStateEvent.ChangedState.FALL_FLYING, false);
@@ -119,8 +119,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
         PlayerHotbarDropItemEvent.BACKEND.invoke(dropItemEvent);
 
         if (dropItemEvent.isCancelled()) {
-            if ((Object) this instanceof ServerPlayer) {
-                ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
+            if ((Object) this instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(0, 36 + selectedSlot, serverPlayer.getMainHandItem()));
             }
             cir.setReturnValue(false);

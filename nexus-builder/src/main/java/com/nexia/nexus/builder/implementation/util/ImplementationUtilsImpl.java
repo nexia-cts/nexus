@@ -49,14 +49,11 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
 
     @Override
     public StatusEffect.Type getType(StatusEffect effect) {
-        switch(((MobEffectExtension) EFFECTS.get(effect)).getCategory()) {
-            case HARMFUL:
-                return StatusEffect.Type.HARMFUL;
-            case BENEFICIAL:
-                return StatusEffect.Type.BENEFICIAL;
-            default:
-                return StatusEffect.Type.NEUTRAL;
-        }
+        return switch (((MobEffectExtension) EFFECTS.get(effect)).getCategory()) {
+            case HARMFUL -> StatusEffect.Type.HARMFUL;
+            case BENEFICIAL -> StatusEffect.Type.BENEFICIAL;
+            default -> StatusEffect.Type.NEUTRAL;
+        };
     }
 
     @Override
@@ -134,15 +131,11 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
                         : (T) new StatusEffect.Other() {
                     @Override
                     public Type getType() {
-                        switch (((MobEffectExtension) mcType).getCategory()) {
-                            case HARMFUL:
-                                return Type.HARMFUL;
-                            case BENEFICIAL:
-                                return Type.BENEFICIAL;
-                            case NEUTRAL:
-                            default:
-                                return Type.NEUTRAL;
-                        }
+                        return switch (((MobEffectExtension) mcType).getCategory()) {
+                            case HARMFUL -> Type.HARMFUL;
+                            case BENEFICIAL -> Type.BENEFICIAL;
+                            default -> Type.NEUTRAL;
+                        };
                     }
 
                     @Override

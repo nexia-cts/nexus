@@ -40,7 +40,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
-import org.checkerframework.common.aliasing.qual.Unique;
+import org.spongepowered.asm.mixin.Unique;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -64,7 +64,7 @@ public abstract class ServerPlayerMixin extends net.minecraft.world.entity.playe
     @Shadow public ServerGamePacketListenerImpl connection;
     @Shadow @Final public MinecraftServer server;
     @Shadow private int containerCounter;
-    private ServerScoreboard scoreboard;
+    @Unique private ServerScoreboard scoreboard;
 
     @Unique private Inventory prevInventory;
     @Unique private int prevExperienceLevel;
@@ -275,6 +275,7 @@ public abstract class ServerPlayerMixin extends net.minecraft.world.entity.playe
         PlayerCloseContainerEvent.BACKEND.invokeEndFunctions(event);
     }
 
+    @Unique
     private void rollbackContainerCounter() {
         if (this.containerCounter <= 0) {
             this.containerCounter = 99;

@@ -5,12 +5,13 @@ import com.nexia.nexus.builder.extension.world.level.BlockExtension;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Block.class)
 public abstract class BlockMixin implements BlockExtension {
-    private static PlayerBreakBlockEvent currentBreakBlockEvent;
+    @Unique private static PlayerBreakBlockEvent currentBreakBlockEvent;
 
     @Override
     public void currentBreakEvent(PlayerBreakBlockEvent playerBreakBlockEvent) {

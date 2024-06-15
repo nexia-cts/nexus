@@ -53,16 +53,11 @@ public class WrappedStatusEffectInstance extends Wrapped<MobEffectInstance> impl
             if (resourceLocation != null) {
                 StatusEffect.Type type;
                 MobEffectExtension mex = ((MobEffectExtension) effect);
-                switch (mex.getCategory()) {
-                    case BENEFICIAL:
-                        type = StatusEffect.Type.BENEFICIAL;
-                        break;
-                    case HARMFUL:
-                        type = StatusEffect.Type.HARMFUL;
-                        break;
-                    default:
-                        type = StatusEffect.Type.NEUTRAL;
-                }
+                type = switch (mex.getCategory()) {
+                    case BENEFICIAL -> StatusEffect.Type.BENEFICIAL;
+                    case HARMFUL -> StatusEffect.Type.HARMFUL;
+                    default -> StatusEffect.Type.NEUTRAL;
+                };
                 statusEffect = new StatusEffect.Other() {
                     final Type thisType = type;
                     final String id = effect.getDescriptionId();

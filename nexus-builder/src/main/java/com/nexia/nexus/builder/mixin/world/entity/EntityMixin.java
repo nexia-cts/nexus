@@ -42,13 +42,14 @@ public abstract class EntityMixin implements Nameable, CommandSource, Changeable
 
     @Shadow public abstract boolean isShiftKeyDown();
 
-    private com.nexia.nexus.api.world.entity.Entity wrapped;
+    @Unique private com.nexia.nexus.api.world.entity.Entity wrapped;
 
     @Inject(method = "<init>*", at = @At("TAIL"))
     public void injectWrapped(CallbackInfo ci) {
         this.wrapped = createWrapped((Entity) (Object) this);
     }
 
+    @Unique
     public WrappedEntity createWrapped(Entity entity) {
         if (entity instanceof LivingEntity) {
             if (entity instanceof Mob) {
@@ -93,8 +94,7 @@ public abstract class EntityMixin implements Nameable, CommandSource, Changeable
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "setSwimming", at = @At("HEAD"))
     public void injectChangeMovementStateEvent(boolean bl, CallbackInfo ci) {
-        if ((Object) this instanceof ServerPlayer && this.isSwimming() != bl && this.injectChangeMovementStateEvent()) {
-            ServerPlayer player = (ServerPlayer) (Object) this;
+        if ((Object) this instanceof ServerPlayer player && this.isSwimming() != bl && this.injectChangeMovementStateEvent()) {
             Player apiPlayer = Wrapped.wrap(player, WrappedPlayer.class);
             this.changeMovementStateEvent = new PlayerChangeMovementStateEvent(apiPlayer, PlayerChangeMovementStateEvent.ChangedState.SWIMMING, bl);
             PlayerChangeMovementStateEvent.BACKEND.invoke(this.changeMovementStateEvent);
@@ -104,8 +104,7 @@ public abstract class EntityMixin implements Nameable, CommandSource, Changeable
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "setShiftKeyDown", at = @At("HEAD"))
     public void injectChangeMovementStateEvent2(boolean bl, CallbackInfo ci) {
-        if ((Object) this instanceof ServerPlayer && this.injectChangeMovementStateEvent() && this.isShiftKeyDown() != bl) {
-            ServerPlayer player = (ServerPlayer) (Object) this;
+        if ((Object) this instanceof ServerPlayer player && this.injectChangeMovementStateEvent() && this.isShiftKeyDown() != bl) {
             Player apiPlayer = Wrapped.wrap(player, WrappedPlayer.class);
             this.changeMovementStateEvent = new PlayerChangeMovementStateEvent(apiPlayer, PlayerChangeMovementStateEvent.ChangedState.SNEAKING, bl);
             PlayerChangeMovementStateEvent.BACKEND.invoke(this.changeMovementStateEvent);

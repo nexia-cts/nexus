@@ -195,8 +195,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         if (worldData == null) {
             throw new IllegalStateException("Can't read world data options from directory");
         }
-        if (worldData instanceof PrimaryLevelData && name != null) {
-            PrimaryLevelData primLevelData = ((PrimaryLevelData) worldData);
+        if (worldData instanceof PrimaryLevelData primLevelData && name != null) {
             LevelSettings settings = ((PrimaryLevelDataExtension) primLevelData).getSettings();
             LevelSettings newSettings = new LevelSettings(name, settings.gameType(), settings.hardcore(), settings.difficulty(), settings.allowCommands(), settings.gameRules(), settings.getDataPackConfig());
             ((PrimaryLevelDataExtension) primLevelData).setSettings(newSettings);
@@ -213,8 +212,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         if (worldData == null) {
             throw new IllegalStateException("Can't read world data options from directory");
         }
-        if (worldData instanceof PrimaryLevelData && name != null) {
-            PrimaryLevelData primLevelData = ((PrimaryLevelData) worldData);
+        if (worldData instanceof PrimaryLevelData primLevelData && name != null) {
             LevelSettings settings = ((PrimaryLevelDataExtension) primLevelData).getSettings();
             LevelSettings newSettings = new LevelSettings(name, settings.gameType(), settings.hardcore(), settings.difficulty(), settings.allowCommands(), settings.gameRules(), settings.getDataPackConfig());
             ((PrimaryLevelDataExtension) primLevelData).setSettings(newSettings);
@@ -224,9 +222,10 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         }
     }
 
-    private int worldExecCount = 0;
-    private final ExecutorService worldExec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), runnable -> new Thread(runnable, "DynamicWorldLoader-" + (worldExecCount += 1)));
+    @Unique private int worldExecCount = 0;
+    @Unique private final ExecutorService worldExec = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), runnable -> new Thread(runnable, "DynamicWorldLoader-" + (worldExecCount += 1)));
 
+    @Unique
     @SuppressWarnings("FutureReturnValueIgnored")
     private CompletableFuture<Void> loadDynamicWorldAsync0(WorldData worldData, LevelStorageSource.LevelStorageAccess access) {
         DimensionType overworldType = this.registryHolder.dimensionTypes().get(DimensionType.OVERWORLD_LOCATION);
@@ -245,6 +244,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         return future;
     }
 
+    @Unique
     private void loadDynamicWorldSync0(WorldData worldData, LevelStorageSource.LevelStorageAccess access) {
         DynamicWorld dynamicWorld = this.loadDynamicWorldFromFile(worldData, access,
                 this.registryHolder.dimensionTypes().get(DimensionType.OVERWORLD_LOCATION),
@@ -252,6 +252,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         this.registerDynamicWorld(dynamicWorld);
     }
 
+    @Unique
     @SuppressWarnings("ConstantConditions")
     private DynamicWorld loadDynamicWorldFromFile(WorldData worldData, LevelStorageSource.LevelStorageAccess access, DimensionType overworldType, NoiseBasedChunkGenerator defaultGenerator) {
         String levelName = worldData.getLevelName().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9.\\-_]", "_");
@@ -320,7 +321,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
             }
         }
         worldBorder.addListener(new SelectiveBorderChangeListener(worldDimensions));
-        LOGGER.info("Done loading '" + levelName + "'.");
+        LOGGER.info("Done loading '{}'.", levelName);
         return new DynamicWorld(levelName, overworld, worldDimensions, access, worldData);
     }
 
@@ -332,7 +333,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         this.dynamicWorlds.put(world.getLevelName(), world);
         this.levels.putAll(world.getDimensions().stream()
                 .collect(Collectors.<ServerLevel, ResourceKey<Level>, ServerLevel>toMap(Level::dimension, obj -> obj)));
-        LOGGER.info("Registered dynamic world '" + world.getLevelName() + "'.");
+        LOGGER.info("Registered dynamic world '{}'.", world.getLevelName());
     }
 
 
@@ -342,7 +343,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         if (dynamicWorlds.containsKey(name)) {
             DynamicWorld dynamicWorld = dynamicWorlds.get(name);
             if (dynamicWorld.isLoaded()) {
-                LOGGER.info("Unloading dynamically loaded custom world '" + name + "'...");
+                LOGGER.info("Unloading dynamically loaded custom world '{}'...", name);
                 ServerLevel defaultOverworld = this.overworld();
                 BlockPos spawnPos = defaultOverworld.getSharedSpawnPos();
                 for (ServerLevel level : new ArrayList<>(dynamicWorld.getDimensions())) {
@@ -380,7 +381,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
                 return;
             }
         }
-        LOGGER.warn("Tried unloading non-loaded world '" + name + "'!");
+        LOGGER.warn("Tried unloading non-loaded world '{}'!", name);
     }
 
     @Override
@@ -398,6 +399,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
         }
     }
 
+    @Unique
     @ApiStatus.Experimental
     public void saveOverworldData(String name) {
         if (dynamicWorlds.containsKey(name)) {
@@ -427,7 +429,7 @@ public abstract class MinecraftServerMixin extends ReentrantBlockableEventLoop<T
     public List<ServerLevel> getRelatedLevels(ServerLevel serverLevel) {
         List<ServerLevel> dynamicLevels = this.dynamicWorlds.values().stream()
                 .flatMap(dynWorld -> dynWorld.getDimensions().stream())
-                .collect(Collectors.toList());
+                .toList();
         if (!dynamicLevels.contains(serverLevel)) {
             return this.levels.values().stream()
                     .filter(level -> !dynamicLevels.contains(level))
