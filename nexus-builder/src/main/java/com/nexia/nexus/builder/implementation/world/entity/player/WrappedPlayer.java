@@ -319,19 +319,11 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
 
     @Override
     public void sendMessage(Component component, Type type) {
-        ChatType chatType;
-        switch (type) {
-            case CHAT:
-                chatType = ChatType.CHAT;
-                break;
-            case SYSTEM:
-            default:
-                chatType = ChatType.SYSTEM;
-                break;
-            case ACTION_BAR:
-                chatType = ChatType.GAME_INFO;
-                break;
-        }
+        ChatType chatType = switch (type) {
+            case CHAT -> ChatType.CHAT;
+            default -> ChatType.SYSTEM;
+            case ACTION_BAR -> ChatType.GAME_INFO;
+        };
         wrappedPlayer().sendMessage(ObjectMappings.convertComponent(component), chatType, UUID.randomUUID());
     }
 
