@@ -1,5 +1,7 @@
 package com.nexia.nexus.builder.mixin.server.level;
 
+import com.google.common.collect.ImmutableList;
+import com.mojang.authlib.GameProfile;
 import com.nexia.nexus.api.event.entity.LivingEntityDeathEvent;
 import com.nexia.nexus.api.event.player.PlayerCloseContainerEvent;
 import com.nexia.nexus.api.event.player.PlayerDeathEvent;
@@ -17,8 +19,6 @@ import com.nexia.nexus.builder.implementation.world.entity.player.WrappedPlayer;
 import com.nexia.nexus.builder.implementation.world.item.container.menu.WrappedContainerMenu;
 import com.nexia.nexus.builder.implementation.world.scoreboard.WrappedScoreboardTeam;
 import com.nexia.nexus.builder.mixin.server.players.PlayerListAccessor;
-import com.google.common.collect.ImmutableList;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
@@ -40,11 +40,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
-import org.spongepowered.asm.mixin.Unique;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -57,7 +57,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends net.minecraft.world.entity.player.Player implements ServerPlayerExtension, LivingEntityExtension {

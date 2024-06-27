@@ -19,7 +19,7 @@ public class PacketUtilsMixin {
 
     /**
      * Fixes the stack overflow exception that sometimes happens when stopping the server.
-     * Courtesy Spigot (https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/browse/nms-patches/net/minecraft/network/protocol/PlayerConnectionUtils.patch)
+     * Courtesy Spigot (<a href="https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/browse/nms-patches/net/minecraft/network/protocol/PlayerConnectionUtils.patch">...</a>)
      * @author rizecookey
      * @reason The automatic refmap creation doesn't handle lambda targets correctly, so we'll have to overwrite
      */
@@ -47,6 +47,7 @@ public class PacketUtilsMixin {
         // end change
     }
 
+    @Unique
     private static MinecraftServer getServer() {
         return SERVER == null ? (SERVER = ((WrappedNexusServer) NexusAPI.getInstance().getServer()).unwrap()) : SERVER;
     }

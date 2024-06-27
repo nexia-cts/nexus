@@ -8,12 +8,15 @@
   "authors": [
     "rizecookey"
   ],
+  "contributors": [
+    "NotCoded"
+  ],
   "contact": {
     "homepage": "https://nexia.dev/",
     "sources": "https://github.com/nexia-cts/nexus"
   },
 
-  "license": "CC0-1.0",
+  "license": "GPL-3.0",
   "icon": "assets/nexusbuilder/icon.png",
 
   "environment": "*",
@@ -30,12 +33,10 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.7.4",
-    "minecraft": [
-      "1.16.x",
-      "1.16.3-combat.8.c"
-    ],
-    "nexus-api": "*"
+    "fabricloader": ">=0.14.21",
+    "minecraft": ["1.16.3-combat.8.c", "1.16.2-1.16.combat-6"],
+    "nexus-api": "*",
+    "java": ">=17"
   },
   "accessWidener": "nexusbuilder.accesswidener"
 }

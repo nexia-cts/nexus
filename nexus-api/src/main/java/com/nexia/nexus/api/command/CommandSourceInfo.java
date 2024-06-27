@@ -1,7 +1,9 @@
 package com.nexia.nexus.api.command;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.nexia.nexus.api.NexusServer;
 import com.nexia.nexus.api.world.entity.Entity;
+import com.nexia.nexus.api.world.entity.player.Player;
 import com.nexia.nexus.api.world.util.Location;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +12,10 @@ public interface CommandSourceInfo {
     CommandSender getSender();
 
     @Nullable Entity getExecutingEntity();
+
+    Entity getExecutingEntityOrException() throws CommandSyntaxException;
+
+    Player getPlayerOrException() throws CommandSyntaxException;
 
     Location getLocation();
 

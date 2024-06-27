@@ -9,6 +9,7 @@ plugins {
 
 def minecraftVersion = "1.16_combat-6"
 def fabricLoaderVersion = "0.14.21"
+def mixinExtrasVersion = "0.3.6"
 
 version = "${rootProject.version}-${minecraftVersion}"
 group = parent.group
@@ -26,6 +27,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${minecraftVersion}"
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${fabricLoaderVersion}"
+	include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixinExtrasVersion}")))
 
 	api project(":nexus-api")
 	include project(":nexus-api")
