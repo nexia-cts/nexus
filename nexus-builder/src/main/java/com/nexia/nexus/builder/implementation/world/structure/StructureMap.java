@@ -52,7 +52,7 @@ public class StructureMap {
      */
     public void pasteMap(@NotNull ServerLevel level, @NotNull BlockPos placePos, @NotNull BlockPos pastePos, boolean forceLoad) {
         NexusServer server = NexusAPI.getInstance().getServer();
-        String start = "execute in " + level.serverLevelData.getLevelName();
+        String start = "execute in " + level.dimension().location().getNamespace() + ":" + level.dimension().location().getPath();
 
         if(forceLoad) server.runCommand(start + " run forceload add 0 0", 4, false);
         server.runCommand(this.returnCommand(level, placePos, pastePos), 4, false);
