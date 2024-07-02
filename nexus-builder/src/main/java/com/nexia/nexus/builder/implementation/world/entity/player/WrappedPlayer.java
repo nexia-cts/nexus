@@ -1,5 +1,7 @@
 package com.nexia.nexus.builder.implementation.world.entity.player;
 
+import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Lifecycle;
 import com.nexia.nexus.api.world.entity.player.GameModeType;
 import com.nexia.nexus.api.world.entity.player.Player;
 import com.nexia.nexus.api.world.item.container.PlayerInventory;
@@ -7,7 +9,9 @@ import com.nexia.nexus.api.world.item.container.menu.ContainerMenu;
 import com.nexia.nexus.api.world.item.container.menu.MenuHolder;
 import com.nexia.nexus.api.world.nbt.NBTObject;
 import com.nexia.nexus.api.world.scoreboard.Scoreboard;
+import com.nexia.nexus.api.world.sound.SoundSource;
 import com.nexia.nexus.api.world.sound.SoundType;
+import com.nexia.nexus.api.world.types.Minecraft;
 import com.nexia.nexus.api.world.util.Location;
 import com.nexia.nexus.api.world.util.Vector3D;
 import com.nexia.nexus.builder.exception.WrappingException;
@@ -21,26 +25,22 @@ import com.nexia.nexus.builder.implementation.world.item.container.WrappedPlayer
 import com.nexia.nexus.builder.implementation.world.item.container.menu.WrappedContainerMenu;
 import com.nexia.nexus.builder.implementation.world.item.container.menu.WrappedMenuHolder;
 import com.nexia.nexus.builder.implementation.world.scoreboard.WrappedScoreboard;
-import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Lifecycle;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitlesPacket;
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
-import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
+import net.minecraft.network.protocol.game.*;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerScoreboard;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -113,7 +113,23 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
     public void playSound(SoundType soundType, float volume, float pitch) {
         String string = ObjectMappings.SOUNDS.get(soundType);
         SoundEvent soundEvent = (SoundEvent) ((WritableRegistry) Registry.SOUND_EVENT).registerOrOverride(OptionalInt.empty(), ResourceKey.create(Registry.SOUND_EVENT.key(), new ResourceLocation(string)), new SoundEvent(new ResourceLocation(string)), Lifecycle.stable());
-        this.wrappedPlayer().connection.send(new ClientboundSoundPacket(soundEvent, SoundSource.MASTER, this.getLocation().getX(), this.getLocation().getY(), this.getLocation().getZ(), volume, pitch));
+        this.wrappedPlayer().connection.send(new ClientboundSoundPacket(soundEvent, net.minecraft.sounds.SoundSource.MASTER, this.getLocation().getX(), this.getLocation().getY(), this.getLocation().getZ(), volume, pitch));
+    }
+
+    @Override
+    public void stopSound(SoundType soundType) {
+        this.stopSound(soundType, Minecraft.SoundSource.MASTER);
+    }
+
+    @Override
+    public void stopSound(SoundType soundType, SoundSource soundSource) {
+        String string = ObjectMappings.SOUNDS.get(soundType);
+        this.wrappedPlayer().connection.send(new ClientboundStopSoundPacket(new ResourceLocation("minecraft", string), ObjectMappings.SOUNDSOURCES.get(soundSource)));
+    }
+
+    @Override
+    public void stopAllSounds() {
+        this.wrappedPlayer().connection.send(new ClientboundStopSoundPacket());
     }
 
     @Override
@@ -254,6 +270,11 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
     }
 
     @Override
+    public int getLatency() {
+        return wrappedPlayer().latency;
+    }
+
+    @Override
     public Scoreboard getScoreboard() {
         return Wrapped.wrap(((ServerPlayerExtension) wrappedPlayer()).getScoreboard(), WrappedScoreboard.class);
     }
@@ -293,6 +314,22 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
             wrappedPlayer().connection.handleClientCommand(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.PERFORM_RESPAWN));
         }
     }
+
+    @Override
+    public void setRespawnPosition(Location location, float respawnAngle, boolean respawnForced, boolean sendMessage) {
+        wrappedPlayer().setRespawnPosition(Level.OVERWORLD, new BlockPos(location.getX(), location.getY(), location.getZ()), respawnAngle, respawnForced, sendMessage);
+    }
+
+    @Override
+    public Location getRespawnPosition() {
+        BlockPos blockPos = wrappedPlayer().getRespawnPosition();
+        if (blockPos == null) {
+            return new Location(0, 0, 0, this.getWorld());
+        } else {
+            return new Location(blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.getWorld());
+        }
+    }
+
 
     @Override
     public void showPlayerInTabList(Player player, boolean show) {

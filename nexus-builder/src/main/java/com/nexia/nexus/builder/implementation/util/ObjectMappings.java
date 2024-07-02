@@ -13,6 +13,7 @@ import com.nexia.nexus.api.world.item.Enchantment;
 import com.nexia.nexus.api.world.item.ItemType;
 import com.nexia.nexus.api.world.item.container.menu.ContainerMenuType;
 import com.nexia.nexus.api.world.nbt.NBTValue;
+import com.nexia.nexus.api.world.sound.SoundSource;
 import com.nexia.nexus.api.world.sound.SoundType;
 import com.nexia.nexus.api.world.types.Minecraft;
 import com.google.common.collect.BiMap;
@@ -46,6 +47,7 @@ public abstract class ObjectMappings {
     public static final BiMap<ItemType, net.minecraft.world.item.Item> ITEMS = HashBiMap.create();
     public static final BiMap<EntityType, net.minecraft.world.entity.EntityType<?>> ENTITIES = HashBiMap.create();
     public static final BiMap<SoundType, String> SOUNDS = HashBiMap.create();
+    public static final BiMap<SoundSource, net.minecraft.sounds.SoundSource> SOUNDSOURCES = HashBiMap.create();
     public static final BiMap<StateProperty<?>, Property<?>> STATE_PROPERTIES = HashBiMap.create();
     public static final BiMap<StateProperty.StatePropertyEnum, Object> STATE_PROPERTY_ENUMS = HashBiMap.create();
     public static final BiMap<NBTValue.Type, Class<? extends Tag>> NBT_VALUE_TYPES = HashBiMap.create();
@@ -80,6 +82,19 @@ public abstract class ObjectMappings {
         } catch (ClassNotFoundException e) {
             LogManager.getLogger("ObjectMappings").error(e);
         }
+    }
+
+    public static void setUpSoundSources() {
+        SOUNDSOURCES.put(Minecraft.SoundSource.MASTER, net.minecraft.sounds.SoundSource.MASTER);
+        SOUNDSOURCES.put(Minecraft.SoundSource.MUSIC, net.minecraft.sounds.SoundSource.MUSIC);
+        SOUNDSOURCES.put(Minecraft.SoundSource.RECORDS, net.minecraft.sounds.SoundSource.RECORDS);
+        SOUNDSOURCES.put(Minecraft.SoundSource.WEATHER, net.minecraft.sounds.SoundSource.WEATHER);
+        SOUNDSOURCES.put(Minecraft.SoundSource.BLOCKS, net.minecraft.sounds.SoundSource.BLOCKS);
+        SOUNDSOURCES.put(Minecraft.SoundSource.HOSTILE, net.minecraft.sounds.SoundSource.HOSTILE);
+        SOUNDSOURCES.put(Minecraft.SoundSource.NEUTRAL, net.minecraft.sounds.SoundSource.NEUTRAL);
+        SOUNDSOURCES.put(Minecraft.SoundSource.PLAYERS, net.minecraft.sounds.SoundSource.PLAYERS);
+        SOUNDSOURCES.put(Minecraft.SoundSource.AMBIENT, net.minecraft.sounds.SoundSource.AMBIENT);
+        SOUNDSOURCES.put(Minecraft.SoundSource.VOICE, net.minecraft.sounds.SoundSource.VOICE);
     }
 
     public static void setUpSoundTypes() {
@@ -1075,6 +1090,8 @@ public abstract class ObjectMappings {
         SOUNDS.put(Minecraft.Sound.ZOMBIE_VILLAGER_DEATH, "entity.zombie_villager.death");
         SOUNDS.put(Minecraft.Sound.ZOMBIE_VILLAGER_HURT, "entity.zombie_villager.hurt");
         SOUNDS.put(Minecraft.Sound.ZOMBIE_VILLAGER_STEP, "entity.zombie_villager.step");
+
+        setUpSoundSources();
     }
 
     public static void setupEffects() {

@@ -27,6 +27,26 @@ public interface Entity extends CommandSender {
 
     void setCustomName(Component customName);
 
+    boolean isCustomNameVisible();
+
+    void setCustomNameVisible(boolean customNameVisible);
+
+    boolean isNoGravity();
+
+    void setNoGravitiy(boolean noGravitiy);
+
+    boolean isInvisible();
+
+    void setInvisible(boolean invisible);
+
+    boolean isGlowing();
+
+    void setGlowing(boolean glowing);
+
+    boolean isInvulnerable();
+
+    void setInvulnerable(boolean invulnurable);
+
     Location getLocation();
 
     World getWorld();

@@ -87,6 +87,11 @@ public class WrappedNexusServer extends Wrapped<DedicatedServer> implements Nexu
     }
 
     @Override
+    public void stopServer() {
+        wrapped.stopServer();
+    }
+
+    @Override
     public boolean hasWorld(String name) {
         return ((MinecraftServerExtension) wrapped).hasDynamicWorld(name);
     }

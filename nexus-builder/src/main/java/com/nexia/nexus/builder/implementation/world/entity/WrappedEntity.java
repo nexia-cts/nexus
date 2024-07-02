@@ -65,6 +65,56 @@ public class WrappedEntity extends Wrapped<net.minecraft.world.entity.Entity> im
     }
 
     @Override
+    public boolean isCustomNameVisible() {
+        return wrapped.isCustomNameVisible();
+    }
+
+    @Override
+    public void setCustomNameVisible(boolean customNameVisible) {
+        wrapped.setCustomNameVisible(customNameVisible);
+    }
+
+    @Override
+    public boolean isNoGravity() {
+        return wrapped.isNoGravity();
+    }
+
+    @Override
+    public void setNoGravitiy(boolean noGravitiy) {
+        wrapped.setNoGravity(noGravitiy);
+    }
+
+    @Override
+    public boolean isInvisible() {
+        return wrapped.isInvisible();
+    }
+
+    @Override
+    public void setInvisible(boolean invisible) {
+        wrapped.setInvisible(invisible);
+    }
+
+    @Override
+    public boolean isGlowing() {
+        return wrapped.isGlowing();
+    }
+
+    @Override
+    public void setGlowing(boolean glowing) {
+        wrapped.setGlowing(glowing);
+    }
+
+    @Override
+    public boolean isInvulnerable() {
+        return wrapped.isInvulnerable();
+    }
+
+    @Override
+    public void setInvulnerable(boolean invulnurable) {
+        wrapped.setInvulnerable(invulnurable);
+    }
+
+    @Override
     public Location getLocation() {
         return new Location(wrapped.getX(), wrapped.getY(), wrapped.getZ(), wrapped.yRot, wrapped.xRot, getWorld());
     }
