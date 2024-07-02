@@ -56,6 +56,7 @@ public class CommandSourceInfoImpl implements CommandSourceInfo, SharedSuggestio
         return executingEntity;
     }
 
+    @Override
     public Entity getExecutingEntityOrException() throws CommandSyntaxException {
         if (this.executingEntity == null) {
             throw ERROR_NOT_ENTITY.create();
@@ -64,6 +65,7 @@ public class CommandSourceInfoImpl implements CommandSourceInfo, SharedSuggestio
         }
     }
 
+    @Override
     public Player getPlayerOrException() throws CommandSyntaxException {
         if (!(this.executingEntity instanceof Player)) {
             throw ERROR_NOT_PLAYER.create();
