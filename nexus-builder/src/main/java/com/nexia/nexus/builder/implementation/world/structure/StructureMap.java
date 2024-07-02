@@ -82,7 +82,7 @@ public class StructureMap {
      * @return The command (/execute in dimension:name run setblock ...).
      */
     public String returnCommand(@NotNull ServerLevel level, @NotNull BlockPos placePos, @NotNull BlockPos pastePos) {
-        String start = "execute in " + level.serverLevelData.getLevelName();
+        String start = "execute in " + level.dimension().location().getNamespace() + ":" + level.dimension().location().getPath();
 
         if(this.rotation != Rotation.NO_ROTATION) {
             return String.format("%s run setblock %s %s %s minecraft:structure_block{mode:'LOAD',name:'%s:%s',posX:%s,posY:%s,posZ:%s,rotation:\"%s\"}", start, placePos.getX(), placePos.getY(), placePos.getZ(), this.id.getNamespace(), this.id.getId(), pastePos.getX(), pastePos.getY(), pastePos.getZ(), this.rotation.id);
