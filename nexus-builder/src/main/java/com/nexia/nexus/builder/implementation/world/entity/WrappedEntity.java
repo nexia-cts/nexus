@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class WrappedEntity extends Wrapped<net.minecraft.world.entity.Entity> implements Entity {
     public WrappedEntity(net.minecraft.world.entity.Entity wrapped) {
@@ -49,6 +50,11 @@ public class WrappedEntity extends Wrapped<net.minecraft.world.entity.Entity> im
     @Override
     public Component getName() {
         return ObjectMappings.convertComponent(wrapped.getName());
+    }
+
+    @Override
+    public UUID getUUID() {
+        return wrapped.getUUID();
     }
 
     @Override

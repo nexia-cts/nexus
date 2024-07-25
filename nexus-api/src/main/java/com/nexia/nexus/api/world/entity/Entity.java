@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface Entity extends CommandSender {
     int getEntityId();
@@ -21,6 +22,8 @@ public interface Entity extends CommandSender {
     EntityType getEntityType();
 
     Component getName();
+
+    UUID getUUID();
 
     @Nullable
     Component getCustomName();

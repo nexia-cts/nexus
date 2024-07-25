@@ -265,11 +265,6 @@ public class WrappedPlayer extends WrappedLivingEntity implements Player {
     }
 
     @Override
-    public UUID getUUID() {
-        return wrappedPlayer().getUUID();
-    }
-
-    @Override
     public int getLatency() {
         return wrappedPlayer().latency;
     }
