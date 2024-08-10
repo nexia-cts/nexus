@@ -52,12 +52,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
     @Redirect(method = "dropEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     public boolean changeShouldDropEquipment(GameRules gameRules, GameRules.Key<GameRules.BooleanValue> key) {
         if (key.equals(GameRules.RULE_KEEPINVENTORY) && this.getDeathEvent() != null) {
-            //return !getDeathEvent().isDropEquipment();
-            // TODO: fix that
-            // java.lang.NoSuchMethodError'boolean com.nexia.nexus.api.event.entity.LivingEntityDeathEvent.isDropEquipment()'
-            // ???
-
-            return gameRules.getBoolean(key);
+            return !getDeathEvent().isDropEquipment();
         } else {
             return gameRules.getBoolean(key);
         }

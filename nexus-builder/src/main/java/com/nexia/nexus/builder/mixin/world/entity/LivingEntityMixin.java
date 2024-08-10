@@ -101,13 +101,9 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
 
     @Redirect(method = "dropAllDeathLoot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;dropEquipment()V"))
     public void disableShouldDropEquipment(LivingEntity livingEntity) {
-        if (this.deathEvent == null /*|| this.deathEvent.isDropEquipment()*/) {
+        if (this.deathEvent == null || this.deathEvent.isDropEquipment()) {
             this.dropEquipment();
         }
-
-        // TODO: fix that
-        // java.lang.NoSuchMethodError'boolean com.nexia.nexus.api.event.entity.LivingEntityDeathEvent.isDropEquipment()'
-        // ???
     }
 
     @Redirect(method = "dropAllDeathLoot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;dropExperience()V"))
