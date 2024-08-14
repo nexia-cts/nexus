@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Player.class)
-@SuppressWarnings("UnusedMethod")
+@SuppressWarnings({"UnusedMethod", "UnusedVariable"})
 public abstract class PlayerMixin extends LivingEntity {
 
     protected PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
