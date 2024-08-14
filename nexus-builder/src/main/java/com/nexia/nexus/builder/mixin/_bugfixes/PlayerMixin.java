@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(Player.class)
+@SuppressWarnings("UnusedMethod")
 public class PlayerMixin {
 
     // Fixes MC-193343

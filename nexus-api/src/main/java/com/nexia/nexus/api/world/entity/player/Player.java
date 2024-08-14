@@ -60,7 +60,6 @@ public interface Player extends LivingEntity, MessageReceiver {
     void setGameMode(GameModeType gameMode);
 
     String getRawName();
-    UUID getUUID();
     int getLatency();
 
     Scoreboard getScoreboard();

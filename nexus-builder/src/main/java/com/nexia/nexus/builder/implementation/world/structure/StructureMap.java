@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 
 @Deprecated
+@SuppressWarnings("EmptyBlockTag")
 public class StructureMap {
 
     // Default

@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
+@SuppressWarnings("UnusedMethod")
 public abstract class ServerPlayerMixin extends Player {
     public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
@@ -38,6 +39,7 @@ public abstract class ServerPlayerMixin extends Player {
      * This fixes players still sleeping after they have been switched to spectator mode (<a href="https://bugs.mojang.com/browse/MC-119417">MC-119417</a>)
      * And also fixes <a href="https://bugs.mojang.com/browse/MC-81773">MC-81773</a> and <a href="https://bugs.mojang.com/browse/MC-206705">MC-206705</a>
      */
+    @SuppressWarnings("UnusedVariable")
     @Inject(method = "setGameMode", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;stopRiding()V"))
     private void onChangeToSpectator(GameType gameType, CallbackInfo ci) {
         this.stopSleeping();

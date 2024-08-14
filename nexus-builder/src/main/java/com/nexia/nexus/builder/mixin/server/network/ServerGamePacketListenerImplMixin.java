@@ -260,6 +260,7 @@ public abstract class ServerGamePacketListenerImplMixin {
 
     @Unique private static final String[] ABUSABLE_SEQUENCES = { "@", "[", "nbt", "=", "{", "}", "]" };
 
+    @SuppressWarnings("UnusedMethod")
     @Inject(method = "handleCustomCommandSuggestions", at = @At("HEAD"), cancellable = true)
     private void fixSuggestionsCrash(ServerboundCommandSuggestionPacket serverboundCommandSuggestionPacket, CallbackInfo ci) {
         final String text = serverboundCommandSuggestionPacket.getCommand();

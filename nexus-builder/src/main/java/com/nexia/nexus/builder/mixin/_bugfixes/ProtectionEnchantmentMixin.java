@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(ProtectionEnchantment.class)
+@SuppressWarnings({"InvalidBlockTag", "MissingSummary"})
 public class ProtectionEnchantmentMixin {
     /**
      * @author NotInfinityy
