@@ -257,4 +257,34 @@ public abstract class ServerGamePacketListenerImplMixin {
 
         PlayerCloseContainerEvent.BACKEND.invokeEndFunctions(event);
     }
+
+    @Unique private static final String[] ABUSABLE_SEQUENCES = { "@", "[", "nbt", "=", "{", "}", "]" };
+
+    @Inject(method = "handleCustomCommandSuggestions", at = @At("HEAD"), cancellable = true)
+    private void fixSuggestionsCrash(ServerboundCommandSuggestionPacket serverboundCommandSuggestionPacket, CallbackInfo ci) {
+        final String text = serverboundCommandSuggestionPacket.getCommand();
+        int length = text.length();
+
+        if(this.player.hasPermissions(2)) return;
+
+        if (length > 256) {
+            ci.cancel();
+            return;
+        }
+
+        if (length > 64) {
+            final int index = text.indexOf(' ');
+            if (index == -1 || index >= 64) {
+                ci.cancel();
+                return;
+            }
+        }
+
+        for (String sequence : ABUSABLE_SEQUENCES) {
+            if (text.contains(sequence)) {
+                ci.cancel();
+                return;
+            }
+        }
+    }
 }
