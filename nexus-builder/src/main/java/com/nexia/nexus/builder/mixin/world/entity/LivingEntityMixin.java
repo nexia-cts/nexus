@@ -1,5 +1,6 @@
 package com.nexia.nexus.builder.mixin.world.entity;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.nexia.nexus.api.event.entity.LivingEntityDamageEvent;
 import com.nexia.nexus.api.event.entity.LivingEntityDeathEvent;
 import com.nexia.nexus.api.event.player.PlayerChangeMovementStateEvent;
@@ -12,6 +13,7 @@ import com.nexia.nexus.builder.implementation.world.entity.WrappedLivingEntity;
 import com.nexia.nexus.builder.implementation.world.entity.player.WrappedPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,9 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -47,6 +47,8 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
     @Shadow public abstract double getAttributeValue(Attribute attribute);
 
     @Shadow public abstract ItemStack getBlockingItem();
+
+    @Shadow public abstract boolean addEffect(MobEffectInstance mobEffectInstance);
 
     public LivingEntityMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -201,26 +203,12 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
         }
     }
 
-    /**
-     * @author NotCoded
-     * @reason Fix Shield Knockback
-     */
-    @Overwrite
-    public void knockback(float f, double d, double e) {
-        LivingEntity instance = (LivingEntity) (Object) this;
+    @SuppressWarnings("UnusedMethod")
+    @Redirect(method = "knockback", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(DD)D"))
+    private double fixShieldKnockback(double a, double b, @Local ItemStack itemStack) {
+        if(!(LivingEntity.class.cast(this) instanceof Player)) return Math.min(a, b);
         double g = this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
-        ItemStack itemStack = this.getBlockingItem();
-        if (!itemStack.isEmpty()) {
-            if (instance instanceof Player) g = Math.min(1.0, 1-(1-g)*(1-(double) ShieldItem.getShieldKnockbackResistanceValue(itemStack)));
-            else g = Math.min(1.0, g + (double) ShieldItem.getShieldKnockbackResistanceValue(itemStack));
-        }
 
-        f = (float)((double)f * (1.0 - g));
-        if (!(f <= 0.0F)) {
-            instance.hasImpulse = true;
-            Vec3 vec3 = instance.getDeltaMovement();
-            Vec3 vec32 = (new Vec3(d, 0.0, e)).normalize().scale(f);
-            instance.setDeltaMovement(vec3.x / 2.0 - vec32.x, instance.isOnGround() ? Math.min(0.4, (double)f * 0.75) : Math.min(0.4, vec3.y + (double)f * 0.5),vec3.z / 2.0 - vec32.z);
-        }
+        return Math.min(1.0, 1-(1-g)*(1-(double) ShieldItem.getShieldKnockbackResistanceValue(itemStack)));
     }
 }
