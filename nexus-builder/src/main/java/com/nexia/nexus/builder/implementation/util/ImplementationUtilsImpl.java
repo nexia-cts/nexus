@@ -27,8 +27,11 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
+import java.util.Locale;
+
 import static com.nexia.nexus.builder.implementation.util.ObjectMappings.*;
 
+@SuppressWarnings("Immutable")
 public class ImplementationUtilsImpl implements ImplementationUtils {
     @Override
     public int getMaxLevel(Enchantment enchantment) {
@@ -245,9 +248,9 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
                     };
                 }
 
-                String replacedmcType = mcType.toString().toLowerCase().replace("_", ".");
-                return SOUNDS.inverse().containsKey(replacedmcType)
-                        ? (T) SOUNDS.inverse().get(replacedmcType)
+                String replacedMCType = mcType.toString().toLowerCase(Locale.ROOT).replace("_", ".");
+                return SOUNDS.inverse().containsKey(replacedMCType)
+                        ? (T) SOUNDS.inverse().get(replacedMCType)
                         : (T) new SoundType.Other() {
                     @Override
                     public Identifier getNamespaceId() {
