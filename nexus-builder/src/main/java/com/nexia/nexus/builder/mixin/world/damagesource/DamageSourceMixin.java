@@ -35,13 +35,11 @@ public abstract class DamageSourceMixin implements Wrap<DamageData> {
         return wrapped;
     }
 
-    /**
-     * @author NotInfinityy
-     * @reason Fix shields not being able to block explosions due to getting the wrong source position
-     */
+    /* Currently doesn't work with End Crystals and Respawn Anchors
     @Overwrite
     public static DamageSource explosion(@Nullable Explosion explosion) {
         assert explosion != null;
         return new EntityDamageSource("explosion", explosion.source).setScalesWithDifficulty().setExplosion();
     }
+    */
 }

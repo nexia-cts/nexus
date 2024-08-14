@@ -35,8 +35,8 @@ public abstract class CraftingBlockMenusMixin implements BlockDependentMenu, Lev
         this.prevAccess = null;
         this.player = inventory.player;
 
-        if (this.getContainerLevelAccess() == ContainerLevelAccess.NULL) {
-            this.setIndependent(true);
+        if (this.nexus$getContainerLevelAccess() == ContainerLevelAccess.NULL) {
+            this.nexus$setIndependent(true);
         }
     }
 
@@ -48,19 +48,19 @@ public abstract class CraftingBlockMenusMixin implements BlockDependentMenu, Lev
     }
 
     @Override
-    public void setIndependent(boolean independent) {
+    public void nexus$setIndependent(boolean independent) {
         this.independent = independent;
         if (independent) {
-            this.prevAccess = this.getContainerLevelAccess();
-            this.setContainerLevelAccess(ContainerLevelAccess.create(player.level, BlockPos.ZERO));
+            this.prevAccess = this.nexus$getContainerLevelAccess();
+            this.nexus$setContainerLevelAccess(ContainerLevelAccess.create(player.level, BlockPos.ZERO));
         } else {
-            this.setContainerLevelAccess(prevAccess);
+            this.nexus$setContainerLevelAccess(prevAccess);
             this.prevAccess = null;
         }
     }
 
     @Override
-    public boolean isIndependent() {
+    public boolean nexus$isIndependent() {
         return independent;
     }
 
