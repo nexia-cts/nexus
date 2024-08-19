@@ -1,6 +1,5 @@
 package com.nexia.nexus.builder.mixin.world.entity;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.nexia.nexus.api.event.entity.LivingEntityDamageEvent;
 import com.nexia.nexus.api.event.entity.LivingEntityDeathEvent;
 import com.nexia.nexus.api.event.player.PlayerChangeMovementStateEvent;
@@ -11,7 +10,11 @@ import com.nexia.nexus.builder.implementation.Wrapped;
 import com.nexia.nexus.builder.implementation.world.damage.WrappedDamageData;
 import com.nexia.nexus.builder.implementation.world.entity.WrappedLivingEntity;
 import com.nexia.nexus.builder.implementation.world.entity.player.WrappedPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -20,8 +23,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -51,6 +56,8 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
     @Shadow public abstract ItemStack getBlockingItem();
 
     @Shadow public abstract boolean addEffect(MobEffectInstance mobEffectInstance);
+
+    @Shadow public abstract ItemStack getMainHandItem();
 
     public LivingEntityMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -225,6 +232,13 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityEx
             Vec3 vec3 = instance.getDeltaMovement();
             Vec3 vec32 = (new Vec3(d, 0.0, e)).normalize().scale(f);
             instance.setDeltaMovement(vec3.x / 2.0 - vec32.x, instance.isOnGround() ? Math.min(0.4, (double)f * 0.75) : Math.min(0.4, vec3.y + (double)f * 0.5),vec3.z / 2.0 - vec32.z);
+        }
+    }
+
+    @Inject(method = "blockedByShield", at = @At("TAIL"))
+    private void playShieldBlockSound(LivingEntity livingEntity, CallbackInfo ci) {
+        if (!(this.getMainHandItem().getItem() instanceof AxeItem)) {
+            this.level.playSound(null, new BlockPos(this.position()), SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 1.0F, 0.8F + this.level.random.nextFloat() * 0.4F);
         }
     }
 }
