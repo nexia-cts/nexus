@@ -44,6 +44,11 @@ public class WrappedLivingEntity extends WrappedEntity implements LivingEntity {
     }
 
     @Override
+    public float getMaxHealth() {
+        return wrappedLiving().getMaxHealth();
+    }
+
+    @Override
     public void setHealth(float health) {
         wrappedLiving().setHealth(health);
     }

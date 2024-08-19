@@ -7,12 +7,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(LevelStorageSource.LevelStorageAccess.class)
 public abstract class LevelStorageSource$LevelStorageAccessMixin implements LevelStorageAccessExtension {
-    private String customLevelId = null;
+    @Unique private String customLevelId = null;
 
     @Override
     public void setCustom(String customLevelId) {

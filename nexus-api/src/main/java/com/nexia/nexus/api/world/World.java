@@ -8,6 +8,7 @@ import com.nexia.nexus.api.world.block.BlockState;
 import com.nexia.nexus.api.world.border.WorldBorder;
 import com.nexia.nexus.api.world.entity.Entity;
 import com.nexia.nexus.api.world.entity.player.GameModeType;
+import com.nexia.nexus.api.world.entity.player.Player;
 import com.nexia.nexus.api.world.util.BoundingBox;
 import com.nexia.nexus.api.world.util.Location;
 
@@ -25,6 +26,8 @@ public interface World {
     }
     BlockEntity getBlockEntity(Location location);
     List<Entity> getEntities();
+    List<Entity> getEntities(Predicate<Entity> filter);
+    List<Player> getPlayers();
 
     default List<Entity> getEntities(BoundingBox area) {
         return getEntities(area, (entity) -> true);
@@ -34,6 +37,7 @@ public interface World {
     boolean spawn(Entity entity);
 
     Entity getEntity(UUID uuid);
+    Player getPlayer(UUID uuid);
 
     NexusServer getServer();
 

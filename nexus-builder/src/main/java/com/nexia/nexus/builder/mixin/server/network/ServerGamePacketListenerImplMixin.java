@@ -81,8 +81,9 @@ public abstract class ServerGamePacketListenerImplMixin {
 
     // BEGIN: MOVE EVENT
     @Unique private PlayerMoveEvent moveEvent;
-    boolean inject = true;
-    Location oldLocation;
+    @Unique boolean inject = true;
+    @Unique Location oldLocation;
+
     @Inject(method = "handleMovePlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/server/level/ServerLevel;)V", shift = At.Shift.AFTER))
     public void injectPlayerMoveEvent(ServerboundMovePlayerPacket packet, CallbackInfo ci) {
         if (!containsInvalidValues(packet) && inject) {
@@ -135,6 +136,7 @@ public abstract class ServerGamePacketListenerImplMixin {
         }
     }
     
+    @Unique
     private static double[] getMovDif(Location first, Location second) {
         return new double[] {
                 Math.abs(second.getX() - first.getX()),
@@ -156,14 +158,9 @@ public abstract class ServerGamePacketListenerImplMixin {
             PlayerSwapHandItemsEvent playerSwapHandItemsEvent = new PlayerSwapHandItemsEvent(player, oldOffhandItem, newOffhandItem);
             PlayerSwapHandItemsEvent.BACKEND.invoke(playerSwapHandItemsEvent);
 
-            net.minecraft.world.item.ItemStack itemStack = this.player.getItemInHand(InteractionHand.OFF_HAND);
-            if (!playerSwapHandItemsEvent.isCancelled()) {
-                this.player.setItemInHand(InteractionHand.OFF_HAND, this.player.getItemInHand(InteractionHand.MAIN_HAND));
-                this.player.setItemInHand(InteractionHand.MAIN_HAND, itemStack);
-                this.player.stopUsingItem();
+            if(playerSwapHandItemsEvent.isCancelled()) {
+                ci.cancel();
             }
-
-            ci.cancel();
         }
     }
 
@@ -259,5 +256,36 @@ public abstract class ServerGamePacketListenerImplMixin {
         }
 
         PlayerCloseContainerEvent.BACKEND.invokeEndFunctions(event);
+    }
+
+    @Unique private static final String[] ABUSABLE_SEQUENCES = { "@", "[", "nbt", "=", "{", "}", "]" };
+
+    @SuppressWarnings("UnusedMethod")
+    @Inject(method = "handleCustomCommandSuggestions", at = @At("HEAD"), cancellable = true)
+    private void fixSuggestionsCrash(ServerboundCommandSuggestionPacket serverboundCommandSuggestionPacket, CallbackInfo ci) {
+        final String text = serverboundCommandSuggestionPacket.getCommand();
+        int length = text.length();
+
+        if(this.player.hasPermissions(2)) return;
+
+        if (length > 256) {
+            ci.cancel();
+            return;
+        }
+
+        if (length > 64) {
+            final int index = text.indexOf(' ');
+            if (index == -1 || index >= 64) {
+                ci.cancel();
+                return;
+            }
+        }
+
+        for (String sequence : ABUSABLE_SEQUENCES) {
+            if (text.contains(sequence)) {
+                ci.cancel();
+                return;
+            }
+        }
     }
 }

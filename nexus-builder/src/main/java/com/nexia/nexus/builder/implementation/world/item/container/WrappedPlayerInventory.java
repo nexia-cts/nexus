@@ -131,40 +131,28 @@ public class WrappedPlayerInventory extends Wrapped<Inventory> implements Player
     }
 
     private ArmorSlot transformToArmorSlot(int id) {
-        switch (id) {            case 100:
-                return FEET;
-            case 101:
-                return LEGS;
-            case 102:
-                return CHEST;
-            case 103:
-                return HEAD;
-            default:
-                throw new UnsupportedOperationException("Not an armor slot");
-        }
+        return switch (id) {
+            case 100 -> FEET;
+            case 101 -> LEGS;
+            case 102 -> CHEST;
+            case 103 -> HEAD;
+            default -> throw new UnsupportedOperationException("Not an armor slot");
+        };
     }
 
     private int transformToId(EquipmentSlot slot) {
-        if (slot instanceof ArmorSlot) {
-            ArmorSlot armor = (ArmorSlot) slot;
-            switch (armor) {
-                case HEAD:
-                    return 103;
-                case CHEST:
-                    return 102;
-                case LEGS:
-                    return 101;
-                case FEET:
-                    return 100;
-            }
-        } else if (slot instanceof HandSlot) {
-            HandSlot hand = (HandSlot) slot;
-            switch (hand) {
-                case MAIN_HAND:
-                    return wrapped.selected;
-                case OFF_HAND:
-                    return -106;
-            }
+        if (slot instanceof ArmorSlot armor) {
+            return switch (armor) {
+                case HEAD -> 103;
+                case CHEST -> 102;
+                case LEGS -> 101;
+                case FEET -> 100;
+            };
+        } else if (slot instanceof HandSlot hand) {
+            return switch (hand) {
+                case MAIN_HAND -> wrapped.selected;
+                case OFF_HAND -> -106;
+            };
         }
         throw new UnassignableTypeException("Invalid equipment slot");
     }

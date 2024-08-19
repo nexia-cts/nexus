@@ -66,9 +66,7 @@ public class WrappedNexusServer extends Wrapped<DedicatedServer> implements Nexu
     @Override
     public Collection<World> getWorlds() {
         Set<World> worlds = new HashSet<>();
-        wrapped.getAllLevels().forEach((world) -> {
-            worlds.add(Wrapped.wrap(world, WrappedWorld.class));
-        });
+        wrapped.getAllLevels().forEach((world) -> worlds.add(Wrapped.wrap(world, WrappedWorld.class)));
         return worlds;
     }
 
@@ -86,6 +84,11 @@ public class WrappedNexusServer extends Wrapped<DedicatedServer> implements Nexu
     @Override
     public CommandDispatcher<CommandSourceInfo> getCommandDispatcher() {
         return commandDispatcher;
+    }
+
+    @Override
+    public void stopServer() {
+        wrapped.stopServer();
     }
 
     @Override

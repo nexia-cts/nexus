@@ -8,7 +8,9 @@ import com.nexia.nexus.api.world.item.container.PlayerInventory;
 import com.nexia.nexus.api.world.item.container.menu.ContainerMenu;
 import com.nexia.nexus.api.world.item.container.menu.MenuHolder;
 import com.nexia.nexus.api.world.scoreboard.Scoreboard;
+import com.nexia.nexus.api.world.sound.SoundSource;
 import com.nexia.nexus.api.world.sound.SoundType;
+import com.nexia.nexus.api.world.util.Location;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +29,9 @@ public interface Player extends LivingEntity, MessageReceiver {
     int getSelectedSlot();
 
     void playSound(SoundType soundType, float volume, float pitch);
+    void stopSound(SoundType soundType);
+    void stopSound(SoundType soundType, SoundSource soundSource);
+    void stopAllSounds();
 
     void disconnect(Component component);
 
@@ -55,7 +60,7 @@ public interface Player extends LivingEntity, MessageReceiver {
     void setGameMode(GameModeType gameMode);
 
     String getRawName();
-    UUID getUUID();
+    int getLatency();
 
     Scoreboard getScoreboard();
     void setScoreboard(Scoreboard scoreboard);
@@ -64,6 +69,9 @@ public interface Player extends LivingEntity, MessageReceiver {
     Component getDisplayName();
 
     void respawn();
+    void setRespawnPosition(Location location, float respawnAngle, boolean respawnForced, boolean sendMessage);
+    Location getRespawnPosition();
+
 
     void showPlayerInTabList(Player player, boolean show);
     List<Player> getShownInTabList();

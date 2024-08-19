@@ -9,6 +9,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.ItemCombinerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,11 +17,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemCombinerMenu.class)
 public abstract class ItemCombinerMenuMixin implements BlockDependentMenu, LevelAccessOwner {
-    private ContainerLevelAccess prevAccess;
+    @Unique private ContainerLevelAccess prevAccess;
 
-    private Player player;
+    @Unique private Player player;
 
-    private boolean independent;
+    @Unique private boolean independent;
+
+    @Unique
+    ContainerLevelAccess access;
+
+    @Unique
+    @Override
+    public void nexus$setContainerLevelAccess(ContainerLevelAccess access) {
+        this.access = access;
+    }
+
+    @Unique
+    @Override
+    public ContainerLevelAccess nexus$getContainerLevelAccess() {
+        return access;
+    }
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void injectCustomContainerLevelAccess(MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, CallbackInfo ci) {
@@ -28,8 +44,8 @@ public abstract class ItemCombinerMenuMixin implements BlockDependentMenu, Level
         this.prevAccess = null;
         this.player = inventory.player;
 
-        if (this.getContainerLevelAccess() == ContainerLevelAccess.NULL) {
-            this.setIndependent(true);
+        if (this.nexus$getContainerLevelAccess() == ContainerLevelAccess.NULL) {
+            this.nexus$setIndependent(true);
         }
     }
 
@@ -41,19 +57,19 @@ public abstract class ItemCombinerMenuMixin implements BlockDependentMenu, Level
     }
 
     @Override
-    public void setIndependent(boolean independent) {
+    public void nexus$setIndependent(boolean independent) {
         this.independent = independent;
         if (independent) {
-            this.prevAccess = this.getContainerLevelAccess();
-            this.setContainerLevelAccess(ContainerLevelAccess.create(player.level, BlockPos.ZERO));
+            this.prevAccess = this.nexus$getContainerLevelAccess();
+            this.nexus$setContainerLevelAccess(ContainerLevelAccess.create(player.level, BlockPos.ZERO));
         } else {
-            this.setContainerLevelAccess(prevAccess);
+            this.nexus$setContainerLevelAccess(prevAccess);
             this.prevAccess = null;
         }
     }
 
     @Override
-    public boolean isIndependent() {
+    public boolean nexus$isIndependent() {
         return independent;
     }
 }

@@ -28,6 +28,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import org.apache.logging.log4j.LogManager;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -40,8 +41,9 @@ import java.util.Map;
 
 @Mixin(DedicatedServer.class)
 public abstract class DedicatedServerMixin extends MinecraftServer implements Wrap<NexusServer>, MinecraftServerExtension {
-    private WrappedNexusServer wrapped;
-    private NexusAPI api;
+    @Unique private WrappedNexusServer wrapped;
+    @Unique private NexusAPI api;
+
     public DedicatedServerMixin(Thread thread, RegistryAccess.RegistryHolder registryHolder, LevelStorageSource.LevelStorageAccess levelStorageAccess, WorldData worldData, PackRepository packRepository, Proxy proxy, DataFixer dataFixer, ServerResources serverResources, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, GameProfileCache gameProfileCache, ChunkProgressListenerFactory chunkProgressListenerFactory) {
         super(thread, registryHolder, levelStorageAccess, worldData, packRepository, proxy, dataFixer, serverResources, minecraftSessionService, gameProfileRepository, gameProfileCache, chunkProgressListenerFactory);
     }
@@ -100,6 +102,7 @@ public abstract class DedicatedServerMixin extends MinecraftServer implements Wr
         modEntrypoints.keySet().forEach(mod -> this.loadEntrypoints(mod, modEntrypoints, loaded));
     }
 
+    @Unique
     public void loadEntrypoints(ModContainer modContainer, Map<ModContainer, List<NexusPlugin>> entrypointMap, List<ModContainer> loaded) {
         for (ModDependency dependencyContainer : modContainer.getMetadata().getDependencies()) {
             ModContainer dependency = FabricLoader.getInstance().getModContainer(dependencyContainer.getModId()).orElseThrow(() -> new IllegalStateException("Dependency not present"));

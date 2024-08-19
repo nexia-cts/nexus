@@ -13,6 +13,8 @@ public interface LivingEntity extends Entity {
 
     float getHealth();
 
+    float getMaxHealth();
+
     void setHealth(float health);
 
     boolean isDead();

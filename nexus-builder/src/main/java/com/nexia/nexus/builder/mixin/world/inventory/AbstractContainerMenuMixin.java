@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,7 +35,7 @@ public abstract class AbstractContainerMenuMixin implements Wrap<ContainerMenu> 
 
     @Shadow public abstract MenuType<?> getType();
 
-    private WrappedContainerMenu wrapped;
+    @Unique private WrappedContainerMenu wrapped;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void injectWrap(MenuType<?> menuType, int i, CallbackInfo ci) {
@@ -74,6 +75,7 @@ public abstract class AbstractContainerMenuMixin implements Wrap<ContainerMenu> 
         PlayerContainerClickEvent.BACKEND.invokeEndFunctions(clickEvent);
     }
 
+    @Unique
     public Pair<SlotClickType, Button> getAPITypes(int slot, int button, ClickType type) {
         SlotClickType slotClickType;
         Button apiButton;
@@ -92,19 +94,12 @@ public abstract class AbstractContainerMenuMixin implements Wrap<ContainerMenu> 
                         : SlotClickType.SHIFT_CLICK;
                 break;
             case QUICK_CRAFT:
-                switch (button % 4) {
-                    case 0:
-                        slotClickType = SlotClickType.DRAG_START;
-                        break;
-                    case 1:
-                        slotClickType = SlotClickType.DRAG_CONTINUE;
-                        break;
-                    case 2:
-                        slotClickType = SlotClickType.DRAG_STOP;
-                        break;
-                    default:
-                        slotClickType = SlotClickType.NONE;
-                }
+                slotClickType = switch (button % 4) {
+                    case 0 -> SlotClickType.DRAG_START;
+                    case 1 -> SlotClickType.DRAG_CONTINUE;
+                    case 2 -> SlotClickType.DRAG_STOP;
+                    default -> SlotClickType.NONE;
+                };
                 break;
             case PICKUP_ALL:
                 slotClickType = SlotClickType.DOUBLE_CLICK;
@@ -118,19 +113,12 @@ public abstract class AbstractContainerMenuMixin implements Wrap<ContainerMenu> 
             case QUICK_MOVE:
             case CLONE:
             case PICKUP_ALL:
-                switch (button) {
-                    case 0:
-                        apiButton = Button.LEFT_CLICK;
-                        break;
-                    case 1:
-                        apiButton = Button.RIGHT_CLICK;
-                        break;
-                    case 2:
-                        apiButton = Button.MIDDLE_CLICK;
-                        break;
-                    default:
-                        apiButton = Button.NONE;
-                }
+                apiButton = switch (button) {
+                    case 0 -> Button.LEFT_CLICK;
+                    case 1 -> Button.RIGHT_CLICK;
+                    case 2 -> Button.MIDDLE_CLICK;
+                    default -> Button.NONE;
+                };
                 break;
             case SWAP:
                 apiButton = Button.hotkey(button);
@@ -139,19 +127,12 @@ public abstract class AbstractContainerMenuMixin implements Wrap<ContainerMenu> 
                 apiButton = Button.DROP;
                 break;
             case QUICK_CRAFT:
-                switch (button / 4) {
-                    case 0:
-                        apiButton = Button.LEFT_CLICK;
-                        break;
-                    case 1:
-                        apiButton = Button.RIGHT_CLICK;
-                        break;
-                    case 2:
-                        apiButton = Button.MIDDLE_CLICK;
-                        break;
-                    default:
-                        apiButton = Button.NONE;
-                }
+                apiButton = switch (button / 4) {
+                    case 0 -> Button.LEFT_CLICK;
+                    case 1 -> Button.RIGHT_CLICK;
+                    case 2 -> Button.MIDDLE_CLICK;
+                    default -> Button.NONE;
+                };
                 break;
             default:
                 apiButton = Button.NONE;

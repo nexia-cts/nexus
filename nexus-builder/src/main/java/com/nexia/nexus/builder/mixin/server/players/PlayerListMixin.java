@@ -1,5 +1,12 @@
 package com.nexia.nexus.builder.mixin.server.players;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.nexia.nexus.api.event.player.PlayerJoinEvent;
 import com.nexia.nexus.api.event.player.PlayerRespawnEvent;
 import com.nexia.nexus.api.world.util.Location;
@@ -24,14 +31,11 @@ import net.minecraft.world.level.border.WorldBorder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.UUID;
 
@@ -40,17 +44,17 @@ public abstract class PlayerListMixin {
     @Shadow public abstract void broadcastMessage(Component component, ChatType chatType, UUID uUID);
 
     @Shadow @Final private MinecraftServer server;
+
     // BEGIN: JOIN EVENT
-    Component joinMessage;
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;broadcastMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/ChatType;Ljava/util/UUID;)V", ordinal = 0))
-    public void catchJoinMessage(PlayerList playerList, Component component, ChatType chatType, UUID uUID) {
-        joinMessage = component;
+    public void catchJoinMessage(PlayerList playerList, Component component, ChatType chatType, UUID uUID, @Share("component") LocalRef<Component> joinMessage) {
+        joinMessage.set(component);
     }
 
     @Inject(method = "placeNewPlayer", at = @At("TAIL"))
-    public void callPlayerJoinEvent(Connection connection, ServerPlayer serverPlayer, CallbackInfo ci) {
+    public void callPlayerJoinEvent(Connection connection, ServerPlayer serverPlayer, CallbackInfo ci, @Share("component") LocalRef<Component> joinMessage) {
         PlayerJoinEvent joinEvent = new PlayerJoinEvent(Wrapped.wrap(serverPlayer, WrappedPlayer.class),
-                ObjectMappings.convertComponent(joinMessage));
+                ObjectMappings.convertComponent(joinMessage.get()));
         PlayerJoinEvent.BACKEND.invoke(joinEvent);
 
         if (joinEvent.getJoinMessage() != null) {
@@ -62,67 +66,39 @@ public abstract class PlayerListMixin {
     // END: JOIN EVENT
 
     // BEGIN: PlayerRespawnEvent
-    @Unique private PlayerRespawnEvent respawnEvent;
-    @Inject(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    public void injectRespawnEvent(ServerPlayer serverPlayer, boolean arg1, CallbackInfoReturnable<ServerPlayer> cir, BlockPos blockPos, float f, boolean bl2, ServerLevel serverLevel) {
-        Location respawnPoint = blockPos != null ? new Location(blockPos.getX(), blockPos.getY(), blockPos.getZ(), f, 0, Wrapped.wrap(serverLevel, WrappedWorld.class)) : null;
+    @Inject(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", shift = At.Shift.AFTER))
+    public void injectRespawnEvent(ServerPlayer serverPlayer, boolean arg1, CallbackInfoReturnable<ServerPlayer> cir, @Local(ordinal = 0) LocalRef<BlockPos> blockPosRef, @Local(ordinal = 0) LocalFloatRef f, @Local(ordinal = 1) LocalBooleanRef bl2, @Local(ordinal = 0) LocalRef<ServerLevel> serverLevel, @Share("respawnEvent") LocalRef<PlayerRespawnEvent> respawnEventRef) {
+        BlockPos blockPos = blockPosRef.get();
+        Location respawnPoint = blockPos != null ? new Location(blockPos.getX(), blockPos.getY(), blockPos.getZ(), f.get(), 0, Wrapped.wrap(serverLevel.get(), WrappedWorld.class)) : null;
         GameType gameType = serverPlayer.gameMode.getGameModeForPlayer();
-        this.respawnEvent = new PlayerRespawnEvent(Wrapped.wrap(serverPlayer, WrappedPlayer.class), respawnPoint, bl2, ObjectMappings.GAME_MODES.inverse().get(gameType));
+        PlayerRespawnEvent respawnEvent = new PlayerRespawnEvent(Wrapped.wrap(serverPlayer, WrappedPlayer.class), respawnPoint, bl2.get(), ObjectMappings.GAME_MODES.inverse().get(gameType));
         PlayerRespawnEvent.BACKEND.invoke(respawnEvent);
+        Location respawnLoc = respawnEvent.getSpawnpoint();
+        bl2.set(respawnEvent.isSpawnpointForced());
+        if (respawnLoc != null) {
+            blockPosRef.set(new BlockPos(respawnLoc.getX(), respawnLoc.getY(), respawnLoc.getZ()));
+            f.set(respawnLoc.getYaw());
+            serverLevel.set(((WrappedWorld) respawnLoc.getWorld()).unwrap());
+        }
+        respawnEventRef.set(respawnEvent);
     }
 
-    @ModifyVariable(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", ordinal = 0, shift = At.Shift.AFTER))
-    public BlockPos modifyBlockPos(BlockPos prev) {
-        if (respawnEvent != null) {
-            Location respawnLoc = respawnEvent.getSpawnpoint();
-            return respawnLoc != null ? new BlockPos(respawnLoc.getX(), respawnLoc.getY(), respawnLoc.getZ()) : null;
-        } else {
-            return prev;
-        }
-    }
+    @WrapOperation(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;updatePlayerGameMode(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"))
+    public void modifyGameMode(PlayerList instance, ServerPlayer serverPlayer, ServerPlayer serverPlayer2, ServerLevel serverLevel, Operation<Void> original, @Share("respawnEvent") LocalRef<PlayerRespawnEvent> respawnEventRef) {
+        if (respawnEventRef.get() != null) {
+            serverPlayer.gameMode.setGameModeForPlayer(ObjectMappings.GAME_MODES.get(respawnEventRef.get().getRespawnMode()), serverPlayer2.gameMode.getPreviousGameModeForPlayer());
 
-    @ModifyVariable(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", ordinal = 0, shift = At.Shift.AFTER))
-    public float modifyRespawnAngle(float prev) {
-        if (respawnEvent != null) {
-            return respawnEvent.getSpawnpoint() != null ? respawnEvent.getSpawnpoint().getYaw() : 0.0f;
-        } else {
-            return prev;
+            serverPlayer.gameMode.updateGameMode(serverLevel.getServer().getWorldData().getGameType());
+            return;
         }
-    }
-
-    /*
-    @ModifyVariable(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", ordinal = 0, shift = At.Shift.AFTER), ordinal = 1)
-    public boolean modifyIsForced(boolean prev) {
-        if (respawnEvent != null) {
-            return respawnEvent.isSpawnpointForced();
-        } else {
-            return prev;
-        }
-    }
-     */
-
-    @ModifyVariable(method = "respawn", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;", ordinal = 0, shift = At.Shift.AFTER))
-    public ServerLevel modifyLevel(ServerLevel prev) {
-        if (respawnEvent != null) {
-            return respawnEvent.getSpawnpoint() != null ? ((WrappedWorld) respawnEvent.getSpawnpoint().getWorld()).unwrap() : null;
-        } else {
-            return prev;
-        }
-    }
-
-    @Inject(method = "respawn", at = @At(value = "NEW", target = "net/minecraft/server/level/ServerPlayer", shift = At.Shift.BEFORE))
-    public void modifyGameMode(ServerPlayer serverPlayer, boolean bl, CallbackInfoReturnable<ServerPlayer> cir) {
-        if (respawnEvent != null) {
-            serverPlayer.setGameMode(ObjectMappings.GAME_MODES.get(respawnEvent.getRespawnMode()));
-        }
+        original.call(instance, serverPlayer, serverPlayer2, serverLevel);
     }
 
     @Inject(method = "respawn", at = @At("TAIL"))
-    public void nullifyRespawnEvent(ServerPlayer serverPlayer, boolean bl, CallbackInfoReturnable<ServerPlayer> cir) {
-        if (respawnEvent != null) {
-            respawnEvent.getPlayer().setGameMode(respawnEvent.getRespawnMode());
-            PlayerRespawnEvent.BACKEND.invokeEndFunctions(respawnEvent);
-            this.respawnEvent = null;
+    public void nullifyRespawnEvent(ServerPlayer serverPlayer, boolean bl, CallbackInfoReturnable<ServerPlayer> cir, @Local(ordinal = 1) ServerPlayer serverPlayer2, @Share("respawnEvent") LocalRef<PlayerRespawnEvent> respawnEventRef) {
+        if (respawnEventRef.get() != null) {
+            serverPlayer2.setGameMode(ObjectMappings.GAME_MODES.get(respawnEventRef.get().getRespawnMode()));
+            PlayerRespawnEvent.BACKEND.invokeEndFunctions(respawnEventRef.get());
         }
     }
     // END: PlayerRespawnEvent

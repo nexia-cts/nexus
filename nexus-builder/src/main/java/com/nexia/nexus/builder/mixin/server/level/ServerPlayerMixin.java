@@ -1,5 +1,7 @@
 package com.nexia.nexus.builder.mixin.server.level;
 
+import com.google.common.collect.ImmutableList;
+import com.mojang.authlib.GameProfile;
 import com.nexia.nexus.api.event.entity.LivingEntityDeathEvent;
 import com.nexia.nexus.api.event.player.PlayerCloseContainerEvent;
 import com.nexia.nexus.api.event.player.PlayerDeathEvent;
@@ -17,8 +19,6 @@ import com.nexia.nexus.builder.implementation.world.entity.player.WrappedPlayer;
 import com.nexia.nexus.builder.implementation.world.item.container.menu.WrappedContainerMenu;
 import com.nexia.nexus.builder.implementation.world.scoreboard.WrappedScoreboardTeam;
 import com.nexia.nexus.builder.mixin.server.players.PlayerListAccessor;
-import com.google.common.collect.ImmutableList;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket;
@@ -40,11 +40,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Team;
-import org.checkerframework.common.aliasing.qual.Unique;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -57,14 +57,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends net.minecraft.world.entity.player.Player implements ServerPlayerExtension, LivingEntityExtension {
     @Shadow public ServerGamePacketListenerImpl connection;
     @Shadow @Final public MinecraftServer server;
     @Shadow private int containerCounter;
-    private ServerScoreboard scoreboard;
+    @Unique private ServerScoreboard scoreboard;
 
     @Unique private Inventory prevInventory;
     @Unique private int prevExperienceLevel;
@@ -223,14 +222,8 @@ public abstract class ServerPlayerMixin extends net.minecraft.world.entity.playe
     @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;removeEntitiesOnShoulder()V", shift = At.Shift.BEFORE))
     public void loadValues(DamageSource damageSource, CallbackInfo ci) {
         this.deathEventHappened = true;
-        /*
         this.keepInv = !this.getDeathEvent().isDropEquipment();
         this.keepExp = !this.getDeathEvent().isDropExperience();
-        */
-
-        // TODO: fix that
-        // java.lang.NoSuchMethodError'boolean com.nexia.nexus.api.event.entity.LivingEntityDeathEvent.isDropEquipment()'
-        // ???
     }
 
     @Inject(method = "die", at = @At("TAIL"))
@@ -275,6 +268,7 @@ public abstract class ServerPlayerMixin extends net.minecraft.world.entity.playe
         PlayerCloseContainerEvent.BACKEND.invokeEndFunctions(event);
     }
 
+    @Unique
     private void rollbackContainerCounter() {
         if (this.containerCounter <= 0) {
             this.containerCounter = 99;

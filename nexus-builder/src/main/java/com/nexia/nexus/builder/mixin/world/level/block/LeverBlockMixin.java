@@ -57,7 +57,7 @@ public abstract class LeverBlockMixin {
         }
     }
 
-    @ModifyVariable(method = "use", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/LeverBlock;pull(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER), index = 1)
+    @ModifyVariable(method = "use", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/LeverBlock;pull(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/state/BlockState;", shift = At.Shift.AFTER), index = 1, argsOnly = true)
     public BlockState modifyBlockState(BlockState prev) {
         if (changeBlockStateEvent != null) {
             return ((WrappedBlockState) changeBlockStateEvent.getNewBlockState()).state();

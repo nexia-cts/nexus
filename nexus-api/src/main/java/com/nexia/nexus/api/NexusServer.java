@@ -23,6 +23,7 @@ public interface NexusServer extends CommandSender {
     World getWorld(Identifier identifier);
     Scoreboard getServerScoreboard();
     CommandDispatcher<CommandSourceInfo> getCommandDispatcher();
+    void stopServer();
 
     boolean hasWorld(String name);
     void loadWorld(Path path);

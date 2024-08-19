@@ -27,8 +27,11 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
+import java.util.Locale;
+
 import static com.nexia.nexus.builder.implementation.util.ObjectMappings.*;
 
+@SuppressWarnings("Immutable")
 public class ImplementationUtilsImpl implements ImplementationUtils {
     @Override
     public int getMaxLevel(Enchantment enchantment) {
@@ -49,14 +52,11 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
 
     @Override
     public StatusEffect.Type getType(StatusEffect effect) {
-        switch(((MobEffectExtension) EFFECTS.get(effect)).getCategory()) {
-            case HARMFUL:
-                return StatusEffect.Type.HARMFUL;
-            case BENEFICIAL:
-                return StatusEffect.Type.BENEFICIAL;
-            default:
-                return StatusEffect.Type.NEUTRAL;
-        }
+        return switch (((MobEffectExtension) EFFECTS.get(effect)).getCategory()) {
+            case HARMFUL -> StatusEffect.Type.HARMFUL;
+            case BENEFICIAL -> StatusEffect.Type.BENEFICIAL;
+            default -> StatusEffect.Type.NEUTRAL;
+        };
     }
 
     @Override
@@ -134,15 +134,11 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
                         : (T) new StatusEffect.Other() {
                     @Override
                     public Type getType() {
-                        switch (((MobEffectExtension) mcType).getCategory()) {
-                            case HARMFUL:
-                                return Type.HARMFUL;
-                            case BENEFICIAL:
-                                return Type.BENEFICIAL;
-                            case NEUTRAL:
-                            default:
-                                return Type.NEUTRAL;
-                        }
+                        return switch (((MobEffectExtension) mcType).getCategory()) {
+                            case HARMFUL -> Type.HARMFUL;
+                            case BENEFICIAL -> Type.BENEFICIAL;
+                            default -> Type.NEUTRAL;
+                        };
                     }
 
                     @Override
@@ -252,9 +248,9 @@ public class ImplementationUtilsImpl implements ImplementationUtils {
                     };
                 }
 
-                String replacedmcType = mcType.toString().toLowerCase().replace("_", ".");
-                return SOUNDS.inverse().containsKey(replacedmcType)
-                        ? (T) SOUNDS.inverse().get(replacedmcType)
+                String replacedMCType = mcType.toString().toLowerCase(Locale.ROOT).replace("_", ".");
+                return SOUNDS.inverse().containsKey(replacedMCType)
+                        ? (T) SOUNDS.inverse().get(replacedMCType)
                         : (T) new SoundType.Other() {
                     @Override
                     public Identifier getNamespaceId() {

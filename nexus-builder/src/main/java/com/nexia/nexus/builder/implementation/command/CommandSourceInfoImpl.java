@@ -1,5 +1,10 @@
 package com.nexia.nexus.builder.implementation.command;
 
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.nexia.nexus.api.NexusServer;
 import com.nexia.nexus.api.command.CommandSender;
 import com.nexia.nexus.api.command.CommandSourceInfo;
@@ -8,13 +13,11 @@ import com.nexia.nexus.api.world.entity.player.Player;
 import com.nexia.nexus.api.world.scoreboard.ScoreboardTeam;
 import com.nexia.nexus.api.world.util.Location;
 import com.nexia.nexus.builder.implementation.WrappedNexusServer;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.kyori.adventure.text.Component;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -27,6 +30,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CommandSourceInfoImpl implements CommandSourceInfo, SharedSuggestionProvider {
+    public static final SimpleCommandExceptionType ERROR_NOT_PLAYER = new SimpleCommandExceptionType(new TranslatableComponent("permissions.requires.player"));
+    public static final SimpleCommandExceptionType ERROR_NOT_ENTITY = new SimpleCommandExceptionType(new TranslatableComponent("permissions.requires.entity"));
+    
     private final CommandSender sender;
     @Nullable
     private final Entity executingEntity;
@@ -48,6 +54,24 @@ public class CommandSourceInfoImpl implements CommandSourceInfo, SharedSuggestio
     @Override
     public @Nullable Entity getExecutingEntity() {
         return executingEntity;
+    }
+
+    @Override
+    public Entity getExecutingEntityOrException() throws CommandSyntaxException {
+        if (this.executingEntity == null) {
+            throw ERROR_NOT_ENTITY.create();
+        } else {
+            return this.executingEntity;
+        }
+    }
+
+    @Override
+    public Player getPlayerOrException() throws CommandSyntaxException {
+        if (!(this.executingEntity instanceof Player)) {
+            throw ERROR_NOT_PLAYER.create();
+        } else {
+            return (Player) this.executingEntity;
+        }
     }
 
     @Override

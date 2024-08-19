@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface Entity extends CommandSender {
     int getEntityId();
@@ -22,10 +23,32 @@ public interface Entity extends CommandSender {
 
     Component getName();
 
+    UUID getUUID();
+
     @Nullable
     Component getCustomName();
 
     void setCustomName(Component customName);
+
+    boolean isCustomNameVisible();
+
+    void setCustomNameVisible(boolean customNameVisible);
+
+    boolean isNoGravity();
+
+    void setNoGravitiy(boolean noGravitiy);
+
+    boolean isInvisible();
+
+    void setInvisible(boolean invisible);
+
+    boolean isGlowing();
+
+    void setGlowing(boolean glowing);
+
+    boolean isInvulnerable();
+
+    void setInvulnerable(boolean invulnurable);
 
     Location getLocation();
 

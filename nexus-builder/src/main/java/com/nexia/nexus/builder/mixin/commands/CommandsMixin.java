@@ -32,6 +32,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -96,6 +97,7 @@ public abstract class CommandsMixin {
 
     // Copy of Commands.fillUsableCommands(...) for our dispatcher
     // Bit sketchy, but eh...
+    @Unique
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void fillAPICommands(CommandNode<CommandSourceInfo> commandNode, CommandNode<SharedSuggestionProvider> commandNode2, CommandSourceInfo commandSourceStack, Map<CommandNode<CommandSourceInfo>, CommandNode<SharedSuggestionProvider>> map) {
         for (CommandNode<CommandSourceInfo> commandSourceInfoCommandNode : commandNode.getChildren()) {

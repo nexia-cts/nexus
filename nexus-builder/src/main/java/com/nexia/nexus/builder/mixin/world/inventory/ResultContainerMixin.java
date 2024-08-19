@@ -5,13 +5,14 @@ import com.nexia.nexus.builder.extension.wrap.Wrap;
 import com.nexia.nexus.builder.implementation.world.item.container.WrappedGenericContainer;
 import net.minecraft.world.inventory.ResultContainer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ResultContainer.class)
 public abstract class ResultContainerMixin implements Wrap<Container> {
-    WrappedGenericContainer wrapped;
+    @Unique WrappedGenericContainer wrapped;
 
     @Inject(method = "<init>*", at = @At("TAIL"))
     public void injectWrapped(CallbackInfo ci) {

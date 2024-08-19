@@ -7,9 +7,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(MenuType.MenuSupplier.class)
 public interface MenuSupplierMixin<T extends AbstractContainerMenu> extends MenuSupplierExtension<T> {
+    @Unique
     @Environment(EnvType.SERVER)
     T create(int i, Inventory inventory);
 

@@ -52,12 +52,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
     @Redirect(method = "dropEquipment", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     public boolean changeShouldDropEquipment(GameRules gameRules, GameRules.Key<GameRules.BooleanValue> key) {
         if (key.equals(GameRules.RULE_KEEPINVENTORY) && this.getDeathEvent() != null) {
-            //return !getDeathEvent().isDropEquipment();
-            // TODO: fix that
-            // java.lang.NoSuchMethodError'boolean com.nexia.nexus.api.event.entity.LivingEntityDeathEvent.isDropEquipment()'
-            // ???
-
-            return gameRules.getBoolean(key);
+            return !getDeathEvent().isDropEquipment();
         } else {
             return gameRules.getBoolean(key);
         }
@@ -74,7 +69,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
 
     @Unique private PlayerChangeMovementStateEvent changeMovementStateEvent;
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "startFallFlying", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "startFallFlying", at = @At("HEAD"))
     public void injectChangeMovementStateEvent(CallbackInfo ci) {
         if (((EntityExtension) this).injectChangeMovementStateEvent() && (Object) this instanceof ServerPlayer && !this.isFallFlying()) {
             this.changeMovementStateEvent = new PlayerChangeMovementStateEvent(Wrapped.wrap(this, WrappedPlayer.class), PlayerChangeMovementStateEvent.ChangedState.FALL_FLYING, true);
@@ -92,7 +87,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "stopFallFlying", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "stopFallFlying", at = @At("HEAD"))
     public void injectChangeMovementStateEvent2(CallbackInfo ci) {
         if (((EntityExtension) this).injectChangeMovementStateEvent() && (Object) this instanceof ServerPlayer && this.isFallFlying()) {
             this.changeMovementStateEvent = new PlayerChangeMovementStateEvent(Wrapped.wrap(this, WrappedPlayer.class), PlayerChangeMovementStateEvent.ChangedState.FALL_FLYING, false);
@@ -119,8 +114,7 @@ public abstract class PlayerMixin extends LivingEntity implements LivingEntityEx
         PlayerHotbarDropItemEvent.BACKEND.invoke(dropItemEvent);
 
         if (dropItemEvent.isCancelled()) {
-            if ((Object) this instanceof ServerPlayer) {
-                ServerPlayer serverPlayer = (ServerPlayer) (Object) this;
+            if ((Object) this instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.send(new ClientboundContainerSetSlotPacket(0, 36 + selectedSlot, serverPlayer.getMainHandItem()));
             }
             cir.setReturnValue(false);

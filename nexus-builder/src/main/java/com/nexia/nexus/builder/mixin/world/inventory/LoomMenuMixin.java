@@ -16,12 +16,12 @@ public abstract class LoomMenuMixin implements LevelAccessOwner {
     private ContainerLevelAccess access;
 
     @Override
-    public void setContainerLevelAccess(ContainerLevelAccess access) {
+    public void nexus$setContainerLevelAccess(ContainerLevelAccess access) {
         this.access = access;
     }
 
     @Override
-    public ContainerLevelAccess getContainerLevelAccess() {
+    public ContainerLevelAccess nexus$getContainerLevelAccess() {
         return access;
     }
 }

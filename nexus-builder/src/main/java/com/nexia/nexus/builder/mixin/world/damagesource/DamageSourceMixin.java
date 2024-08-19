@@ -5,14 +5,19 @@ import com.nexia.nexus.builder.extension.wrap.Wrap;
 import com.nexia.nexus.builder.implementation.util.ObjectMappings;
 import com.nexia.nexus.builder.implementation.world.damage.WrappedDamageData;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.EntityDamageSource;
+import net.minecraft.world.level.Explosion;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DamageSource.class)
 public abstract class DamageSourceMixin implements Wrap<DamageData> {
-    private DamageData wrapped;
+    @Unique private DamageData wrapped;
 
     @SuppressWarnings("unused")
     @Inject(method = "<clinit>", at = @At("TAIL"))
@@ -29,4 +34,12 @@ public abstract class DamageSourceMixin implements Wrap<DamageData> {
     public DamageData wrap() {
         return wrapped;
     }
+
+    /* Currently doesn't work with End Crystals and Respawn Anchors
+    @Overwrite
+    public static DamageSource explosion(@Nullable Explosion explosion) {
+        assert explosion != null;
+        return new EntityDamageSource("explosion", explosion.source).setScalesWithDifficulty().setExplosion();
+    }
+    */
 }

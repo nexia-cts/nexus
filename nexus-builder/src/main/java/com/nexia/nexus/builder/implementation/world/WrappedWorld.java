@@ -10,6 +10,7 @@ import com.nexia.nexus.api.world.block.BlockState;
 import com.nexia.nexus.api.world.border.WorldBorder;
 import com.nexia.nexus.api.world.entity.Entity;
 import com.nexia.nexus.api.world.entity.player.GameModeType;
+import com.nexia.nexus.api.world.entity.player.Player;
 import com.nexia.nexus.api.world.util.BoundingBox;
 import com.nexia.nexus.api.world.util.Location;
 import com.nexia.nexus.builder.exception.WrappingException;
@@ -22,6 +23,7 @@ import com.nexia.nexus.builder.implementation.world.block.WrappedBlockState;
 import com.nexia.nexus.builder.implementation.world.border.WrappedWorldBorder;
 import com.nexia.nexus.builder.implementation.world.entity.WrappedEntity;
 import com.google.common.collect.ImmutableList;
+import com.nexia.nexus.builder.implementation.world.entity.player.WrappedPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -69,11 +71,29 @@ public class WrappedWorld extends Wrapped<ServerLevel> implements World {
     @Override
     public List<Entity> getEntities() {
         List<Entity> entities = new ArrayList<>();
-        wrapped.getAllEntities().forEach((entity) -> {
-            entities.add(Wrapped.wrap(entity, WrappedEntity.class));
-        });
+        wrapped.getAllEntities().forEach((entity) -> entities.add(Wrapped.wrap(entity, WrappedEntity.class)));
         return entities;
     }
+
+    @Override
+    public List<Entity> getEntities(Predicate<Entity> filter) {
+        List<Entity> entities = new ArrayList<>();
+        for(net.minecraft.world.entity.Entity entity : wrapped.getAllEntities()) {
+            Entity wrappedEntity = Wrapped.wrap(entity, WrappedEntity.class);
+            if(!filter.test(wrappedEntity)) continue;
+            entities.add(wrappedEntity);
+        }
+
+        return entities;
+    }
+
+    @Override
+    public List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>();
+        wrapped.players().forEach((player) -> players.add(Wrapped.wrap(player, WrappedPlayer.class)));
+        return players;
+    }
+
 
     @Override
     public List<Entity> getEntities(BoundingBox area, Predicate<Entity> filter) {
@@ -101,6 +121,11 @@ public class WrappedWorld extends Wrapped<ServerLevel> implements World {
     @Override
     public Entity getEntity(UUID uuid) {
         return Wrapped.wrap(wrapped.getEntity(uuid), WrappedEntity.class);
+    }
+
+    @Override
+    public Player getPlayer(UUID uuid) {
+        return Wrapped.wrap(wrapped.getPlayerByUUID(uuid), WrappedPlayer.class);
     }
 
     @Override

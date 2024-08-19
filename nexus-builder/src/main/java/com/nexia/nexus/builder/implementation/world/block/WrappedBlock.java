@@ -95,8 +95,7 @@ public class WrappedBlock implements Block {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof WrappedBlock)) return false;
-        WrappedBlock that = (WrappedBlock) o;
+        if (!(o instanceof WrappedBlock that)) return false;
         return location.equals(that.location) && mcLevel.equals(that.mcLevel);
     }
 

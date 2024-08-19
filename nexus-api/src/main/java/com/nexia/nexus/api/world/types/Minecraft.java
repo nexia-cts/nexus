@@ -10,6 +10,7 @@ import com.nexia.nexus.api.world.item.ItemStack;
 import com.nexia.nexus.api.world.item.ItemType;
 import com.nexia.nexus.api.world.item.container.menu.ContainerMenuType;
 import com.nexia.nexus.api.world.item.container.menu.MenuHolder;
+import com.nexia.nexus.api.world.sound.SoundSource;
 import com.nexia.nexus.api.world.sound.SoundType;
 import com.google.errorprone.annotations.Immutable;
 import net.kyori.adventure.text.Component;
@@ -1832,6 +1833,23 @@ public abstract class Minecraft {
 
         public static ItemType byIdentifier(Identifier identifier) {
             return utils.getByIdentifier(identifier, ItemType.class);
+        }
+    }
+
+    public enum SoundSource implements com.nexia.nexus.api.world.sound.SoundSource {
+        MASTER,
+        MUSIC,
+        RECORDS,
+        WEATHER,
+        BLOCKS,
+        HOSTILE,
+        NEUTRAL,
+        PLAYERS,
+        AMBIENT,
+        VOICE;
+
+        public static com.nexia.nexus.api.world.sound.SoundSource byIdentifier(Identifier identifier) {
+            return utils.getByIdentifier(identifier, com.nexia.nexus.api.world.sound.SoundSource.class);
         }
     }
 

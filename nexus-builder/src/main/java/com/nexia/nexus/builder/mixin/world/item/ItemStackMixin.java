@@ -23,7 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin implements Wrap<com.nexia.nexus.api.world.item.ItemStack> {
-    private WrappedItemStack wrapped;
+    @Unique private WrappedItemStack wrapped;
+
     @Inject(method = { "<init>(Lnet/minecraft/world/level/ItemLike;I)V", "<init>(Lnet/minecraft/nbt/CompoundTag;)V" }, at = @At("TAIL"))
     public void injectWrapped(CallbackInfo ci) {
         this.wrapped = new WrappedItemStack((ItemStack) (Object) this);
@@ -42,8 +43,7 @@ public abstract class ItemStackMixin implements Wrap<com.nexia.nexus.api.world.i
         if (useItemEvent.isCancelled()) {
             cir.setReturnValue(InteractionResultHolder.fail(stack));
             player.stopUsingItem();
-            if (player instanceof ServerPlayer) {
-                ServerPlayer sPlayer = (ServerPlayer) player;
+            if (player instanceof ServerPlayer sPlayer) {
                 sPlayer.refreshContainer(player.inventoryMenu);
                 if (stack.getItem().equals(Items.ENDER_PEARL)
                         || stack.getItem().equals(Items.SNOWBALL)
