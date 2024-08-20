@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "_bugfixes.ConnectionAccessor",
+    "_bugfixes.ExplosionMixin",
     "_bugfixes.PacketUtilsMixin",
     "_bugfixes.PlayerMixin",
     "_bugfixes.ProtectionEnchantmentMixin",
